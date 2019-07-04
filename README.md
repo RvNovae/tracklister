@@ -4,6 +4,12 @@ This utility converts .m3u8, .nml and .csv files (exported from Rekordbox, Trakt
 
 ![Preview Image](https://puu.sh/DOpO7/18a2361bcb.png)
 
+## Download the binary!
+
+[Windows](https://we.tl/t-RmjnbYV1F3)
+
+[MacOS](https://we.tl/t-iUVmfNfO3s)   
+
 ## Build it yourself!
 
 ### Requirements
@@ -33,9 +39,3 @@ If you would like to package the program for yourself, you can use [Electron Pac
 
 2. Package the program!
 `electron-packager .`
-
-### Binaries
-
-[Windows](https://we.tl/t-RmjnbYV1F3)
-
-[MacOS](https://we.tl/t-iUVmfNfO3s)   
