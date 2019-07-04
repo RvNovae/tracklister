@@ -2,6 +2,8 @@
 
 This utility converts .m3u8, .nml and .csv files (exported from Rekordbox, Traktor and Serato respectively) into a readable tracklist.
 
+![Preview Image](https://puu.sh/DOpO7/18a2361bcb.png)
+
 ## Build it yourself!
 
 ### Requirements
@@ -21,7 +23,7 @@ To get it running you just have to run a few simple commands:
 `npm install`
 
 3. Run the project!
-`npm run`
+`npm start`
 
 ### Packaging
 If you would like to package the program for yourself, you can use [Electron Packager](https://github.com/electron-userland/electron-packager)
