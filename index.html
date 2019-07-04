@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="node_modules/bulma/css/bulma.css">
+        <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.css">
+        <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
+        <link rel="stylesheet" href="style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div id="head">
+            <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
+            <button class="button is-white is-small" id="about_btn">About</button>
+            <center>
+                <p class="title is-3">Tracklister</p>
+                <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor and Serato!</p>
+                Drag and drop your .m3u8, .nml or .csv file!
+            </center>    
+        </div>
+        <hr>
+        <div id="tracklist"></div>
+
+        <div class="modal" id="about_modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                
+            </div>
+            <div class="modal-card">
+                <div class="modal-card-body">
+                    This utility converts .m3u8, .nml and .csv files (exported from Rekordbox, Traktor and Serato respectively) into a readable tracklist. <br/>
+                    Written by Oliver Kogel.
+                </div> 
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+        <script src="converter.js"></script>
+    </body>
+</html>
