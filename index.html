@@ -12,11 +12,12 @@
     <body>
         <div id="head">
             <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
+            <button class="button is-white is-small" id="fileguide_btn">File Guide</button>
             <button class="button is-white is-small" id="about_btn">About</button>
             <center>
                 <p class="title is-3">Tracklister</p>
-                <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor and Serato!</p>
-                Drag and drop your .m3u8, .nml or .csv file!
+                <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor, Serato and Virtual DJ!</p>
+                Drag and drop your .m3u8, .nml, .csv or .m3u file!
             </center>    
         </div>
         <hr>
@@ -24,14 +25,52 @@
 
         <div class="modal" id="about_modal">
             <div class="modal-background"></div>
-            <div class="modal-content">
-                
-            </div>
             <div class="modal-card">
                 <div class="modal-card-body">
-                    This utility converts .m3u8, .nml and .csv files (exported from Rekordbox, Traktor and Serato respectively) into a readable tracklist. <br/>
+                    This utility converts DJ software playlist files into readable tracklists. <br/>
+                    Made for radio DJs and streamers who don't want to type out a 4 hour set after the end of a show. <br/>
+                    <a target="_blank" href="https://github.com/rvnovae/tracklister">Github Repo</a><br/>
                     Written by Oliver Kogel.
                 </div> 
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+        <div class="modal" id="fileguide_modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-body">
+                    <p>This is a list of file types, that this program supports.</p>
+                    <p>Please note that sometimes different software structures the same filetype differently.</p>
+                    <p>Therefore, only the following file type & software combinations will yield usable results</p>
+                    <p>And please don't forget to tag your files before using this program!</p>
+                    <hr>
+                    <div class="field is-grouped is-grouped-multiline">
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">Rekordbox</span>
+                                <span class="tag is-info">.m3u8</span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">Traktor</span>
+                                <span class="tag is-info">.nml</span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">Serato</span>
+                                <span class="tag is-info">.csv</span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">Virtual DJ</span>
+                                <span class="tag is-info">.m3u</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button class="modal-close is-large" aria-label="close"></button>
         </div>
