@@ -5,11 +5,11 @@ Serato and Virtual DJ respectively) into readable tracklists.
 
 ![Preview Image](https://puu.sh/DOpO7/18a2361bcb.png)
 
-## Download the binary!
+## Installers
 
-[Windows](https://we.tl/t-RmjnbYV1F3)
+[Windows](https://we.tl/t-OIXWdLhqzD)
 
-[MacOS](https://we.tl/t-iUVmfNfO3s)   
+[MacOS](https://we.tl/t-YqxVQTXAED)   
 
 ## Build it yourself!
 
