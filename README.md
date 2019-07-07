@@ -33,10 +33,10 @@ To get it running you just have to run a few simple commands:
 `npm start`
 
 ### Packaging
-If you would like to package the program for yourself, you can use [Electron Packager](https://github.com/electron-userland/electron-packager)
+If you would like to package the program for yourself, you can use [Electron Builder](https://github.com/electron-userland/electron-builder)
 
-1. Install electron-packager globally
-`npm install -g electron-packager`
+1. Install electron-builder globally
+`npm install -g electron-builder`
 
 2. Package the program!
-`electron-packager .`
+`electron-builder .` or `yarn dist`
