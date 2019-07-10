@@ -13,16 +13,19 @@ function createWindow () {
       width: 600,
       height: 800,
       webPreferences: {
-        preload: path.join(__dirname, 'preload.js'),
+        preload: path.join(__dirname, 'src/preload.js'),
         nodeIntegration: true
       }  
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('src/index.html')
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
+
+  mainWindow.removeMenu();
+
   mainWindow.webContents.on('new-window', function(e, url) {
     e.preventDefault();
     require('electron').shell.openExternal(url);

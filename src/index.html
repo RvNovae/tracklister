@@ -3,10 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title></title>
-        <link rel="stylesheet" href="node_modules/bulma/css/bulma.css">
-        <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.css">
-        <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
-        <link rel="stylesheet" href="node_modules/bulma-tooltip/dist/css/bulma-tooltip.min.css">
+        <link rel="stylesheet" href="../node_modules/bulma/css/bulma.css">
+        <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+        <link rel="stylesheet" href="../node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
@@ -133,12 +132,12 @@
         <div class="modal" id="edit_modal">
             <div class="modal-background"></div>
             <div class="modal-card">
+                <button class="button is-small is-white is-pulled-right" onclick="close_modal('edit_modal')">Close</button>
                 <div class="modal-card-body">
                     <input class="input" id="edit_input" type="text" placeholder="Artist - Title">
                     <a class="button is-link is-fullwidth" onclick="edit_save()" id="edit_submit">Save</a>
                 </div> 
             </div>
-            <button class="modal-close is-large" aria-label="close"></button>
         </div>
         <div class="modal" id="settings_modal">
             <div class="modal-background"></div>
