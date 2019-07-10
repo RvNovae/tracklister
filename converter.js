@@ -180,7 +180,6 @@ function updateUI() {
     tracks.forEach(function (track) {
         counter++;
         writeTrack(track, counter);
-        document.getElementById("pure_text").innerHTML += counter + ". " + track + '\n';
     });
 }
 
