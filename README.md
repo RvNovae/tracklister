@@ -6,10 +6,8 @@ Serato and Virtual DJ respectively) into readable tracklists.
 ![Preview Image](https://puu.sh/DOpO7/18a2361bcb.png)
 
 ## Installers
-
-[Windows](https://we.tl/t-OIXWdLhqzD)
-
-[MacOS](https://we.tl/t-YqxVQTXAED)   
+Windows & MacOS
+[Download 1.2](https://drive.google.com/open?id=1z6RDijPT1RHMJlgUFxzc1aqc6k5RFk0W)
 
 ## Build it yourself!
 
@@ -27,16 +25,16 @@ To get it running you just have to run a few simple commands:
 `git clone git@github.com:RvNovae/tracklister.git`
 
 2. Initialize the project
-`npm install`
+`yarn install`
 
 3. Run the project!
-`npm start`
+`yarn start`
 
 ### Packaging
 If you would like to package the program for yourself, you can use [Electron Builder](https://github.com/electron-userland/electron-builder)
 
 1. Install electron-builder globally
-`npm install -g electron-builder`
+`yarn add -g electron-builder`
 
 2. Package the program!
 `electron-builder .` or `yarn dist`

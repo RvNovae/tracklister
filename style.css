@@ -9,3 +9,9 @@ body {
 #tracklist {
     margin: 10px;
 }
+#pure_text {
+    display: none;
+}
+#drop_modal {
+    background-color: #E91E63;
+}
