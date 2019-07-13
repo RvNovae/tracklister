@@ -8,7 +8,8 @@ const storage = require('electron-json-storage');
 // array to store all tracks in
 var tracks = [];
 // saves the id/counter of the track that is currently being edited
-var is_editing;
+var is_editing, is_adding, is_add_above, is_add_below;
+// save the state of adding a track, necessary because add and edit share the same save function
 // load settings file or create it
 try {
     settings_load();
@@ -57,6 +58,7 @@ function settings_reset() {
     settings.omit = {}
     settings.omit.switch = false;
     settings.omit.keywords = '';
+   ``
     // save settings to file
     storage.set('settings', settings, function(err) {
         if (err) throw error;   
@@ -99,6 +101,22 @@ document.addEventListener('drop', (e) => {
         convertFile(f.path);
     }
 });
+// handle key inputs
+document.addEventListener('keyup', function(e) {
+    if (e.key === "Escape") {
+        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
+            close_modal(elem.id);
+        });
+    }
+    if (e.key === "Enter") {
+        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
+            if (elem.classList.contains('is-active')) {
+                elem.getElementsByClassName('submit')[0].click();
+            }
+        });
+    }
+})
+
 // clear and prepare the UI / copy button gets activated
 function setUI() {
     document.getElementById("copy_btn").disabled = false;
@@ -148,6 +166,7 @@ document.addEventListener('dragleave', (e) => {
     e.stopPropagation();
     //close_modal('drop_modal');
 });
+
 // determine file type and call file specific function
 function convertFile(input_file) {
     // extract extension from file name
@@ -222,12 +241,60 @@ function edit_track(element, id) {
     document.getElementById('edit_input').value = tracks[id-1];
     is_editing = id;
     open_modal('edit_modal');
+    document.getElementById('edit_input').focus();
 }
 // save the the edited data at position is_editing-1, close the edit modal and reload the UI
 function edit_save() {
-    tracks[is_editing-1] = document.getElementById('edit_input').value;
+    if (is_adding) {
+        var temp_tracks = [];
+        var desired_location;
+        if (is_add_above) {desired_location = is_editing-1}
+        if (is_add_below) {desired_location = is_editing}
+        if(!is_add_above && !is_add_below) {desired_location = tracks.length}
+        console.log(desired_location);
+
+        for (let i = 0; i < tracks.length; i++) {
+            if (i >= desired_location) {
+                temp_tracks[i+1] = tracks[i];
+            }
+            else {temp_tracks[i] = tracks[i];}
+            console.log(temp_tracks);
+        }
+        temp_tracks[desired_location] = document.getElementById('edit_input').value;
+        tracks = temp_tracks;
+    }
+    else {
+        tracks[is_editing-1] = document.getElementById('edit_input').value;
+    }
     close_modal('edit_modal');
+    is_adding = false;
+    is_add_above = false;
+    is_add_below = false;
     updateUI();
+}
+// function for adding tracks (plus button)
+// because we are reusing the edit modal, saving can be done via the edit_save function
+// if no arguments are passed: simply append the new track to the end of the tracklist
+function add_track(id) {
+    is_adding = true;
+    document.getElementById('edit_input').value = "";
+    if (id == 'new') {
+        is_editing = tracks.length+1;
+    }
+    else {
+        is_editing = id;
+        console.log('is_editing:' + id);
+    }
+    open_modal('edit_modal');
+    document.getElementById('edit_input').focus();
+}
+function add_above(id) {
+    is_add_above = true;
+    add_track(id);
+}
+function add_below(id) {
+    is_add_below = true;
+    add_track(id);
 }
 // this filter returns true if the track passes the ignore list
 // if it returns false, a match with one of the keywords has been found 
@@ -402,6 +469,38 @@ function move_down(element, id) {
         updateUI();
     }
 }
+// this is not a track filter but rather a filter for the counter itself
+// hence it's strange placement
+function filter_tracknumber(counter) {
+    if (settings.tracknumber.switch) {
+        var counter_digits;
+        var highest_digits;
+        var temp_counter = counter;
+        var temp_tracklength = tracks.length;
+
+        if (counter >= 1) ++counter_digits;
+
+        while(temp_counter / 10 >= 1) {
+            temp_counter /= 10;
+            ++counter_digits;
+        }
+
+        if (tracks.length >= 1) ++highest_digits;
+
+        while(temp_tracklength / 10 >= 1) {
+            temp_tracklength /= 10;
+            ++highest_digits;
+        }
+        console.log(highest_digits);
+        console.log(counter_digits);
+        for (let index = 0; counter_digits < highest_digits; index++) {
+            counter = '0' + counter;
+            console.log('yay');
+        }
+    }
+
+    return counter
+}
 // this function is responsible for writing tracks to the screen
 function writeTrack(track, counter) {
     // run the through all the filters
@@ -410,6 +509,9 @@ function writeTrack(track, counter) {
     if (!track) {
         return 0;
     }
+    // because the counter might get altered in some way,
+    // we have to use a seperate variable for the one that gets displayed
+    var display_counter = counter;
     // set track in the array  (this may be redundant, could possibly be removed)
     tracks[counter-1] = track;
     // write the visible tracklist in html
@@ -442,10 +544,17 @@ function writeTrack(track, counter) {
                     <a href="#" onclick="move_down(this, `+counter+`)" class="dropdown-item">
                         <i class="fas fa-angle-down"></i> Move Down
                     </a>
+                    <hr class="dropdown-divider">
+                    <a href="#" onclick="add_above(` + (counter) + `)" class="dropdown-item">
+                        <i class="fas fa-angle-double-up"></i> Insert 1 above
+                    </a>
+                    <a href="#" onclick="add_below(` + (counter) + `)" class="dropdown-item">
+                        <i class="fas fa-angle-double-down"></i> Insert 1 below
+                    </a>
                 </div>
             </div>
         </div>
-    ` + counter + '. ' + track + '<br/>';
+    ` + display_counter + '. ' + track + '<br/>';
     // also write the track to pure_text
     // pure_text is invisible and is only used to make copying the tracklist easier
     document.getElementById('pure_text').innerHTML += counter + '. ' + track + '\n';

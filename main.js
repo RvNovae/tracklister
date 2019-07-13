@@ -12,6 +12,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
       width: 600,
       height: 800,
+      title: "Tracklister " + app.getVersion(),
       webPreferences: {
         preload: path.join(__dirname, 'src/preload.js'),
         nodeIntegration: true

@@ -12,6 +12,7 @@
     <body>
         <div id="head">
             <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
+            <button class="button is-white is-small" onclick="add_track('new')" id="add_btn"><i class="fas fa-plus"></i></button>
             <button class="button is-white is-small" onclick="open_modal('help_modal')" id="help_btn">Help</button>
             <button class="button is-white is-small" onclick="open_modal('settings_modal')" id="settings_btn">Settings</button>
             <button class="button is-white is-small" onclick="open_modal('about_modal')" id="about_btn">About</button>
@@ -40,7 +41,7 @@
                     Check out the <a target="_blank" href="https://github.com/rvnovae/tracklister">Github Repository</a>!<br/>
                     <hr>
                     <span class="tag">
-                        Written by Oliver Kogel.
+                        Written by Oliver 'RvNovae' Kogel.
                     </span>
                 </div> 
             </div>
@@ -83,7 +84,7 @@
                         </div>
                     </div>
                     <hr>
-                    <p class="title">Settings Explanation</p>
+                    <p class="title">Settings Guide</p>
                     <p class="title is-5">Promo Syntax</p>
                     <p>
                         This is what the entry will be changed to when pressing the "Set To Promo" button. <br>
@@ -135,7 +136,7 @@
                 <button class="button is-small is-white is-pulled-right" onclick="close_modal('edit_modal')">Close</button>
                 <div class="modal-card-body">
                     <input class="input" id="edit_input" type="text" placeholder="Artist - Title">
-                    <a class="button is-link is-fullwidth" onclick="edit_save()" id="edit_submit">Save</a>
+                    <a class="button submit is-link is-fullwidth" onclick="edit_save()" id="edit_submit">Save</a>
                 </div> 
             </div>
         </div>
@@ -167,7 +168,7 @@
                     <hr>
                     <label><input id="settings_featured_fixer_switch" type="checkbox"> Fix featured artists</label>
                     <hr>
-                    <a class="button is-link is-fullwidth" onclick="settings_save()" id="save_submit">Save</a>
+                    <a class="button submit is-link is-fullwidth" onclick="settings_save()" id="save_submit">Save</a>
                 </div> 
             </div>
         </div>
