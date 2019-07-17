@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const { clipboard, app, shell } = require('electron');
+const { clipboard, app, shell, ipcRenderer } = require('electron');
 const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
@@ -9,6 +9,7 @@ const storage = require('electron-json-storage');
 var tracks = [];
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
+var scroll_pos;
 // save the state of adding a track, necessary because add and edit share the same save function
 // load settings file or create it
 try {
@@ -115,7 +116,7 @@ document.addEventListener('keyup', function(e) {
             }
         });
     }
-})
+});
 
 // clear and prepare the UI / copy button gets activated
 function setUI() {
@@ -143,6 +144,10 @@ document.getElementById('copy_btn').addEventListener('click', function() {
 // generic function to close modal of id
 function close_modal(id) {
     document.getElementById(id).classList.remove('is-active');
+    // the modal resets the scroll position, when opened for some reason
+    // still looking for a way to prevent that, it's quite distracting
+    // for now we just reset it after the modal is closed
+    window.scrollTo(0, scroll_pos);
 }
 // generic function to open modal of id
 function open_modal(id) {
@@ -211,6 +216,9 @@ function toggle_dropdown(element, id) {
 // after destructive actions have been performed on the tracklist, 
 // the UI needs to reload to display those changes
 function updateUI() {
+    // save the current scroll location before clearing the screen
+    scroll_pos = window.scrollY;
+    window.scroll(0,0);
     // reset counter to make sure the numbering is correct
     var counter = 0;
     // make sure tracklist and pure_text are blank before written to
@@ -223,6 +231,9 @@ function updateUI() {
         counter++;
         writeTrack(track, counter);
     });
+    // apply the scroll location again
+    // apparently chrome is too fast, it doesn't work without the millisecond delay
+    setTimeout(function() {window.scrollTo(0, scroll_pos);},1)
 }
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
@@ -243,33 +254,43 @@ function edit_track(element, id) {
     open_modal('edit_modal');
     document.getElementById('edit_input').focus();
 }
-// save the the edited data at position is_editing-1, close the edit modal and reload the UI
+// save the the edited / added data at the desired location, close the edit modal and reload the UI
+// because we re-use the edit modal for adding, they also share the same save function
 function edit_save() {
+    // check whether we're editing or adding
     if (is_adding) {
+        // the temporary array is necessary, otherwise the array can't be read/written properly
         var temp_tracks = [];
         var desired_location;
+        // determine the array index where the track should be stored
         if (is_add_above) {desired_location = is_editing-1}
         if (is_add_below) {desired_location = is_editing}
+        // if neither add above or add below is specified, it will simply be appended
         if(!is_add_above && !is_add_below) {desired_location = tracks.length}
-        console.log(desired_location);
-
+        // iterate through the tracks array
+        // shift all entries after the desired location down by one
         for (let i = 0; i < tracks.length; i++) {
             if (i >= desired_location) {
                 temp_tracks[i+1] = tracks[i];
             }
+            // keep all entries before the desired location
             else {temp_tracks[i] = tracks[i];}
-            console.log(temp_tracks);
         }
+        // assign the added track to the "now free" index
         temp_tracks[desired_location] = document.getElementById('edit_input').value;
+        // apply the temporary array
         tracks = temp_tracks;
     }
+    // apply the edited value to the original value in the array
     else {
         tracks[is_editing-1] = document.getElementById('edit_input').value;
     }
+    // close the modal and reset all the flags
     close_modal('edit_modal');
     is_adding = false;
     is_add_above = false;
     is_add_below = false;
+    // refresh the UI
     updateUI();
 }
 // function for adding tracks (plus button)

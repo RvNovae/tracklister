@@ -1,6 +1,6 @@
 {
   "name": "tracklister",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Generating tracklists from .m3u8 and .nml files.",
   "main": "main.js",
   "scripts": {
