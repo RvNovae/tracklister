@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const { clipboard, app, shell, ipcRenderer } = require('electron');
+const { clipboard, app, shell } = require('electron');
 const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
