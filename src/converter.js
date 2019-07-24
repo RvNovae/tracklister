@@ -7,6 +7,7 @@ const storage = require('electron-json-storage');
 
 // array to store all tracks in
 var tracks = [];
+var settings = {};
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
 var scroll_pos;
