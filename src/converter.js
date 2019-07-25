@@ -601,14 +601,15 @@ function m3u8(input_file) {
         // #EXTINF:269,LU-I - Swallow tail
         // everything interesting is stored after a comma
         // if there is no comma, there is nothing interesting in that line
-        if (RegExp(",").test(line)) {
+        if (RegExp("#EXTINF:").test(line)) {
             // if found
             // increase the counter
             counter += 1;
-            // attempt to split the track at ','
+            // attempt to split the track at the first comma
             // extract everything after the comma
             try {
-                track = line.split(',').pop();
+                var temp = line.split(',', 1).shift() + ',';
+                track = line.replace(temp, '');
             }
             // display an error for the file that could not be gathered properly
             // assume that the file has been not been tagged properly
