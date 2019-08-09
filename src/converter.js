@@ -99,14 +99,13 @@ RegExp.escape = function(string) {
 }
 // Check for passed arguments (Open with tracklister.exe)
 console.log(remote.process.argv);
-setTimeout(function() {
-    remote.process.argv.forEach(function(argument) {
-        if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
-            console.log(argument);
-            convertFile(argument);
-        }
-    });
-},1)
+remote.process.argv.forEach(function(argument) {
+    if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
+        setUI();
+        console.log(argument);
+        convertFile(argument);
+    }
+});
 // listen for file drop
 document.addEventListener('drop', (e) => {
     e.preventDefault();
