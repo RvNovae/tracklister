@@ -4,6 +4,7 @@ const { clipboard, app, shell } = require('electron');
 const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
+const remote = require('electron').remote;
 
 // array to store all tracks in
 var tracks = [];
@@ -91,6 +92,21 @@ function settings_save() {
     // parse the tracklist again with updated settings
     updateUI();
 }
+// this little function ensures that keywords entered by the user can contain special characters
+// otherwise special characters might engage regex syntax
+RegExp.escape = function(string) {
+    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+// Check for passed arguments (Open with tracklister.exe)
+console.log(remote.process.argv);
+setTimeout(function() {
+    remote.process.argv.forEach(function(argument) {
+        if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
+            console.log(argument);
+            convertFile(argument);
+        }
+    });
+},1)
 // listen for file drop
 document.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -321,139 +337,154 @@ function add_below(id) {
 // this filter returns true if the track passes the ignore list
 // if it returns false, a match with one of the keywords has been found 
 function filter_ignore(track, counter) {
-    // If this setting is disabled, return true / let the track pass
-    if (!settings.ignore.switch) {
-        return true;
-    }
-    // check if the keywords string contains any seperators (',')
-    if (RegExp(',').test(RegExp.escape(settings.ignore.keywords))) {
-        // split the list of keywords by ',' and iterate through them
-        settings.ignore.keywords.split(',').forEach(function (keyword) {
-            // check if keyword is found in track name
-            if ((new RegExp(RegExp.escape(keyword), 'gi')).test(track)) {
-                // if a match is found => remove track from array and return false
-                tracks.splice(counter-1, 1);
-                return false;
-            }
-        });
-    }
-    // do this if no seperators (',') have been found in the keywords string
-    else {
-        // if keywords string is empty, let the track pass
-        if (settings.ignore.keywords == '') {
+    try {
+        // If this setting is disabled, return true / let the track pass
+        if (!settings.ignore.switch) {
             return true;
         }
-        // if the keywords string is not empty
-        // assume the keywords string only contains one keyword
-        // check against the keyword
+        // check if the keywords string contains any seperators (',')
+        if (RegExp(',').test(RegExp.escape(settings.ignore.keywords))) {
+            // split the list of keywords by ',' and iterate through them
+            settings.ignore.keywords.split(',').forEach(function (keyword) {
+                // check if keyword is found in track name
+                if ((new RegExp(RegExp.escape(keyword), 'gi')).test(track)) {
+                    // if a match is found => remove track from array and return false
+                    tracks.splice(counter-1, 1);
+                    return false;
+                }
+            });
+        }
+        // do this if no seperators (',') have been found in the keywords string
         else {
-            // if a match is, remove the track from the array and let the track fail
-            if ((new RegExp(RegExp.escape(settings.ignore.keywords), 'gi')).test(track)) {
-                tracks.splice(counter-1, 1);
-                return false;
-            }
-            // if no matches are found, let the track pass
-            else {
+            // if keywords string is empty, let the track pass
+            if (settings.ignore.keywords == '') {
                 return true;
             }
+            // if the keywords string is not empty
+            // assume the keywords string only contains one keyword
+            // check against the keyword
+            else {
+                // if a match is, remove the track from the array and let the track fail
+                if ((new RegExp(RegExp.escape(settings.ignore.keywords), 'gi')).test(track)) {
+                    tracks.splice(counter-1, 1);
+                    return false;
+                }
+                // if no matches are found, let the track pass
+                else {
+                    return true;
+                }
+            }
         }
+    }
+    catch {
+        return true;
     }
 }
 // this filter finds 'featuring', 'versus' and 'AND' conventions in track names
 // it will then change them to the user's set preference
 function filter_syntax(track) {
-    // if this setting is turned off => return the unmodified track
-    if (!settings.syntax.switch) {
+    try {
+        // if this setting is turned off => return the unmodified track
+        if (!settings.syntax.switch) {
+            return track;
+        }
+        // if the 'featuring' string is not empty =>
+        // find and replace all instances with the set preference
+        // try and catch are necessary in case it can't find any instances of these conventions
+        // => save changes to the track variable
+        if (settings.syntax.featuring != '') {
+            try{
+                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + settings.syntax.featuring + ' ');
+            }
+            catch {}
+        }
+        // same for the 'versus' string
+        if (settings.syntax.versus != '') {
+            try {
+                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + settings.syntax.versus + ' ');
+            }
+            catch {}
+        }
+        // same for the 'AND' string
+        if (settings.syntax.and != '') {
+            try {
+                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + settings.syntax.and + ' ');
+            }
+            catch {}
+        }
+        // when done, return the modified track
         return track;
     }
-    // if the 'featuring' string is not empty =>
-    // find and replace all instances with the set preference
-    // try and catch are necessary in case it can't find any instances of these conventions
-    // => save changes to the track variable
-    if (settings.syntax.featuring != '') {
-        try{
-            track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + settings.syntax.featuring + ' ');
-        }
-        catch {}
+    catch {
+        return track;
     }
-    // same for the 'versus' string
-    if (settings.syntax.versus != '') {
-        try {
-            track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + settings.syntax.versus + ' ');
-        }
-        catch {}
-    }
-    // same for the 'AND' string
-    if (settings.syntax.and != '') {
-        try {
-            track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + settings.syntax.and + ' ');
-        }
-        catch {}
-    }
-    // when done, return the modified track
-    return track;
 }
 // this filter will look for featuring tags in the title column
 // and append them to the artist column
 function filter_feature_fix(track) {
     // return unmodified track, if turned off
-    if (!settings.featured_fix.switch) {
-        return track;
-    }
-    // split track into artist and title column by looking for the ' - ' string
-    var artist = track.split(' - ').shift();
-    var title = track.split(' - ').pop();
     try {
-        // attempt to match featuring tags in the title string
-        // if found it will extract everything after the tag, including the tag itself
-        // this info will be stored in the feature variable
-        var feature = title.match(new RegExp('( featuring | ft | ft\. | feat | feat\. )(.*)', 'gi')).pop();
-        // remove extracted string from the title column
-        title = title.replace(feature, '');
-        // append the feature string to the artist column
-        artist += " " + feature;
+        if (!settings.featured_fix.switch) {
+            return track;
+        }
+        // split track into artist and title column by looking for the ' - ' string
+        var artist = track.split(' - ').shift();
+        var title = track.split(' - ').pop();
+        try {
+            // attempt to match featuring tags in the title string
+            // if found it will extract everything after the tag, including the tag itself
+            // this info will be stored in the feature variable
+            var feature = title.match(new RegExp('( featuring | ft | ft\. | feat | feat\. )(.*)', 'gi')).pop();
+            // remove extracted string from the title column
+            title = title.replace(feature, '');
+            // append the feature string to the artist column
+            artist += " " + feature;
+        }
+        catch {}
+        // merge artist and title back together and return them
+        return artist + ' - ' + title;
     }
-    catch {}
-    // merge artist and title back together and return them
-    return artist + ' - ' + title;
+    catch {
+        return track
+    }
 }
 // this filter looks for keywords in the track name 
 // if a match is found, the phrase will be removed from the trackname
 // difference to the ignore filter => track will not get deleted, if a match is found
 // ==> track gets modified
 function filter_omit(track) {
-    // return unmodified track if setting is turned off
-    if (!settings.omit.switch) {
-        return track;
-    }
-    else {
-        // return unmodified track if the keyword list is empty
-        if (settings.omit.keywords == '') {
+    try {
+        // return unmodified track if setting is turned off
+        if (!settings.omit.switch) {
             return track;
         }
         else {
-            try {
-                // split the keywords string at (',') and iterate through them
-                settings.omit.keywords.split(',').forEach(function(keyword) {
-                    // if a match is found it will be replaced with an empty string
-                    track = track.replace(RegExp(RegExp.escape(keyword), 'gi'), '');
-                });
-                // return the modified track 
+            // return unmodified track if the keyword list is empty
+            if (settings.omit.keywords == '') {
                 return track;
             }
-            // if no seperator has been found, assume there is only one keyword
-            catch {
-                // if a match is found it will be replaced with an empty string
-                track = track.replace(RegExp(RegExp.escape(settings.omit.keywords), 'gi'), '');
-                return track;
+            else {
+                try {
+                    // split the keywords string at (',') and iterate through them
+                    settings.omit.keywords.split(',').forEach(function(keyword) {
+                        // if a match is found it will be replaced with an empty string
+                        track = track.replace(RegExp(RegExp.escape(keyword), 'gi'), '');
+                    });
+                    // return the modified track 
+                    return track;
+                }
+                // if no seperator has been found, assume there is only one keyword
+                catch {
+                    // if a match is found it will be replaced with an empty string
+                    track = track.replace(RegExp(RegExp.escape(settings.omit.keywords), 'gi'), '');
+                    return track;
+                }
             }
         }
     }
-}
-// this little function ensures that keywords entered by the user can contain special characters
-// otherwise special characters might engage regex syntax
-RegExp.escape = function(string) {
-    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    catch {
+        return track;
+    }
 }
 // this function runs the track through all the different filters
 function filter(track, id) {
