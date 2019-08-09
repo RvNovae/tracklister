@@ -10,7 +10,7 @@ Additional tools and special filters ensure a consistent and good looking trackl
 ## Installers
 Windows & MacOS
 
-[Download Tracklister 1.3.4 (MacOS Version coming soon)](https://drive.google.com/open?id=1z6RDijPT1RHMJlgUFxzc1aqc6k5RFk0W)
+[Download Tracklister 1.4 (MacOS Version coming soon)](https://drive.google.com/open?id=1z6RDijPT1RHMJlgUFxzc1aqc6k5RFk0W)
 
 ## Build it yourself!
 
