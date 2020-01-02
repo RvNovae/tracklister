@@ -2,15 +2,16 @@
 
 This utility converts .m3u8, .nml, .csv & .m3u files (exported from Rekordbox, Traktor, 
 Serato and Virtual DJ respectively) into readable tracklists.
+Audio files can now be manually added as well.
 
 Additional tools and special filters ensure a consistent and good looking tracklist.
 
 ![Preview Image](https://puu.sh/DSdvk/ce9b8aaa6e.png)
 
 ## Installers
-Windows & MacOS
+Windows
 
-[Download Tracklister 1.4 (MacOS Version coming soon)](https://drive.google.com/open?id=1z6RDijPT1RHMJlgUFxzc1aqc6k5RFk0W)
+[Download Tracklister 1.5.0](https://drive.google.com/open?id=1z6RDijPT1RHMJlgUFxzc1aqc6k5RFk0W)
 
 ## Build it yourself!
 
@@ -28,16 +29,16 @@ To get it running you just have to run a few simple commands:
 `git clone git@github.com:RvNovae/tracklister.git`
 
 2. Initialize the project
-`yarn install`
+`npm install`
 
 3. Run the project!
-`yarn start`
+`npm start`
 
 ### Packaging
 If you would like to package the program for yourself, you can use [Electron Builder](https://github.com/electron-userland/electron-builder)
 
 1. Install electron-builder globally
-`yarn add -g electron-builder`
+`npm add -g electron-builder`
 
 2. Package the program!
-`electron-builder .` or `yarn dist`
+`electron-builder .` or `npm dist`

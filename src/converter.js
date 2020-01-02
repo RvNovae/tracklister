@@ -5,6 +5,9 @@ const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
 const remote = require('electron').remote;
+const mm = require('music-metadata');
+const util = require('util');
+
 
 // array to store all tracks in
 var tracks = [];
@@ -98,7 +101,6 @@ RegExp.escape = function(string) {
     return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 // Check for passed arguments (Open with tracklister.exe)
-console.log(remote.process.argv);
 remote.process.argv.forEach(function(argument) {
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
         setUI();
@@ -140,7 +142,7 @@ function setUI() {
     document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
     document.getElementById("tracklist").innerHTML = "";
     document.getElementById("pure_text").innerHTML = "";
-    tracks.length = 0;
+    //tracks.length = 0;
 }
 // clear and prepare the UI / copy button gets deactivated
 function resetUI() {
@@ -148,7 +150,7 @@ function resetUI() {
     document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
     document.getElementById("tracklist").innerHTML = "";
     document.getElementById("pure_text").innerHTML = "";
-    tracks.length = 0;
+    //tracks.length = 0;
 }
 // add event listener for the copy button
 document.getElementById('copy_btn').addEventListener('click', function() {
@@ -156,6 +158,10 @@ document.getElementById('copy_btn').addEventListener('click', function() {
     clipboard.writeText(document.getElementById('pure_text').innerText);
     // change the copy button apperance => opaque icon ("has been copied!")
     this.innerHTML = '<i class="fas fa-copy"></i>';
+});
+document.getElementById('erase_btn').addEventListener('click', function() {
+    tracks.length = 0;
+    resetUI();
 });
 // generic function to close modal of id
 function close_modal(id) {
@@ -192,6 +198,7 @@ document.addEventListener('dragleave', (e) => {
 function convertFile(input_file) {
     // extract extension from file name
     var extension = input_file.split('.').pop();
+    extension = extension.toLowerCase();
     // call conversion function based on extension
     switch (extension) {
         case 'm3u8':
@@ -205,6 +212,17 @@ function convertFile(input_file) {
             break;
         case 'm3u':
             m3u(input_file);
+            break;
+        // audio files
+        case 'wav':
+        case 'mp3':
+        case 'flac':
+        case 'aiff':
+        case 'aif':
+        case 'aac':
+        case 'ogg':
+        case 'wma':  
+            audio(input_file);
             break;
         default:
             alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
@@ -772,4 +790,33 @@ function m3u(input_file) {
             if (ignored == 0) {counter--}
         }
     });
+}
+
+// when an audio file is dropped -> get metadata / filename
+function audio(input_file) {
+
+    mm.parseFile(input_file, {native: false})
+        .then(metadata => {
+            var track = '';
+            var artist = util.inspect(metadata.common.artist, {showHidden : false, depth : null});
+            if (artist == '') { util.inspect(metadata.common.artists, {showHidden : false, depth : null}); }
+
+            var title = util.inspect(metadata.common.title, {showHidden : false, depth : null});
+
+            artist = artist.substr(1, artist.length -2);
+            title = title.substr(1, title.length -2);
+
+            if (artist && title && artist != 'ndefine' && title != 'ndefine') {
+                track = artist + ' - ' + title;
+            }   
+            else {
+                track = input_file.replace(/^.*[\\\/]/, '').split('.').slice(0, -1).join('.');
+            }
+            tracks.push(track);
+            updateUI();
+            console.log(tracks);
+        })
+        .catch ( err => {
+            console.error(err.message);
+        })
 }

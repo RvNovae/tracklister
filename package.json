@@ -1,6 +1,6 @@
 {
   "name": "tracklister",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Generating tracklists from .m3u8 and .nml files.",
   "main": "main.js",
   "scripts": {
@@ -15,10 +15,11 @@
     "electron-winstaller": "^3.0.4"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.9.0",
-    "array-move": "^2.1.0",
+    "@fortawesome/fontawesome-free": "^5.11.2",
+    "array-move": "^2.2.0",
     "bulma": "^0.7.5",
-    "electron-json-storage": "^4.1.6",
+    "electron-json-storage": "^4.1.8",
+    "music-metadata": "^4.8.2",
     "roboto-fontface": "^0.10.0",
     "xml-js": "^1.6.11"
   }
