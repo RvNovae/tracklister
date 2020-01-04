@@ -860,18 +860,54 @@ function monitor_rekordbox(rekordbox_path) {
 
             files.forEach(function(file) {
                 console.log(file);
-                var result = firstline(path.join(rekordbox_path, file));
+                let result = firstline(path.join(rekordbox_path, file));
 
-                console.log(result);
+                result.then(
+                    function(resolve) {
 
-                // result.then(function (res) {
-                //     alert(res);
-                // });
+                        var array = resolve.split('');
+                        var opening_braces = 0, closing_braces = 0, start_pos = 0, end_pos = 0;
+
+                        for (let i = 0; i < array.length; i++) {
+                            if (array[i] == '{') {
+                                opening_braces++;
+
+                                if (opening_braces == 1) {
+                                    start_pos = i;
+                                }
+                            }
+                            if (array[i] == '}') {
+                                closing_braces++;
+                                if (closing_braces == opening_braces) {
+                                    end_pos = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (start_pos == 0 && end_pos == 0) {
+                            return;
+                        }
+
+                        console.log("Start Index: " + start_pos);
+                        console.log("End Index: " + end_pos);
+
+                        array.splice(0, start_pos);
+                        array.splice(end_pos, array.length);
+                        
+                        //var clean = array.join('');
+                        var clean = resolve.substring(start_pos, end_pos+1);
+
+                        var object = JSON.parse(clean);
+                        
+                        console.log(object);
+                    },
+                    function(error) {
+                        console.log("The promise could not be resolved.");
+                    }
+                )
+
                 return;
-                
-                //var line = result.split('{').pop();
-                //line = '{' + line;
-
                 
             });
         });
