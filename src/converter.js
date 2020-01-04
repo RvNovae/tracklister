@@ -7,7 +7,9 @@ const storage = require('electron-json-storage');
 const remote = require('electron').remote;
 const mm = require('music-metadata');
 const util = require('util');
-
+const path = require('path');
+const process = require('process');
+const firstline = require('firstline');
 
 // array to store all tracks in
 var tracks = [];
@@ -15,6 +17,31 @@ var settings = {};
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
 var scroll_pos;
+
+//boolean whether rekordbox should be monitored or not
+var is_monitoring = true;
+var rekordbox_path = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep;
+
+//rekordbox_path;
+// var temp = fs.readdirSync(rekordbox_path, function (err, items) {
+//     if (err) {
+//         console.log(err)
+//     }
+//     console.log(items);
+//     items.forEach(element => {
+//         if (fs.statSync(rekordbox_path += element).isDirectory()) {
+//             console.log("DIRECTORY:" + element);
+//         }
+//         console.log(element);
+//     });
+// });
+var temp = fs.readdirSync(rekordbox_path);
+
+rekordbox_path += temp[0]
+
+rekordbox_path += path.sep + "tr";
+//console.log(rekordbox_path);
+monitor_rekordbox(rekordbox_path);
 // save the state of adding a track, necessary because add and edit share the same save function
 // load settings file or create it
 try {
@@ -113,6 +140,7 @@ document.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
     // clear / prepare the UI
+    console.log(e);
     setUI();
     // get file object from drop
     for (const f of e.dataTransfer.files) {
@@ -186,6 +214,7 @@ document.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();
     //open_modal('drop_modal');
+    //console.log(e);
 });
 // dragleave function (no implementation yet)
 document.addEventListener('dragleave', (e) => {
@@ -819,4 +848,34 @@ function audio(input_file) {
         .catch ( err => {
             console.error(err.message);
         })
+}
+
+function monitor_rekordbox(rekordbox_path) {
+    setInterval(function() {
+        fs.readdir(rekordbox_path, function(err, files) {
+            if (err) {
+                return console.log('Unable to scan directory: ' + err);
+            }
+            else { console.log ("Scanning: " + rekordbox_path); }
+
+            files.forEach(function(file) {
+                console.log(file);
+                var result = firstline(path.join(rekordbox_path, file));
+
+                console.log(result);
+
+                // result.then(function (res) {
+                //     alert(res);
+                // });
+                return;
+                
+                //var line = result.split('{').pop();
+                //line = '{' + line;
+
+                
+            });
+        });
+
+        if (!is_monitoring) {return;}
+    }, 1000);
 }
