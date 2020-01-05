@@ -22,29 +22,7 @@ var scroll_pos;
 var is_monitoring = true;
 var rekordbox_path = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep;
 var last_rekordbox_id = 0;
-//var fetched_rb_tracks = [];
 
-//rekordbox_path;
-// var temp = fs.readdirSync(rekordbox_path, function (err, items) {
-//     if (err) {
-//         console.log(err)
-//     }
-//     console.log(items);
-//     items.forEach(element => {
-//         if (fs.statSync(rekordbox_path += element).isDirectory()) {
-//             console.log("DIRECTORY:" + element);
-//         }
-//         console.log(element);
-//     });
-// });
-var temp = fs.readdirSync(rekordbox_path);
-
-rekordbox_path += temp[0]
-
-rekordbox_path += path.sep + "tr";
-//console.log(rekordbox_path);
-monitor_rekordbox(rekordbox_path);
-// save the state of adding a track, necessary because add and edit share the same save function
 // load settings file or create it
 try {
     settings_load();
@@ -852,94 +830,101 @@ function audio(input_file) {
         })
 }
 
+var temp = fs.readdirSync(rekordbox_path);
+rekordbox_path += temp[0]
+rekordbox_path += path.sep + "tr";
+
+monitor_rekordbox(rekordbox_path);
+
+setInterval(function() {
+    if (monitor_rekordbox) {
+        monitor_rekordbox(rekordbox_path);
+    }
+}, 1000);
+
 function monitor_rekordbox(rekordbox_path) {
-    setInterval(function() {
-        fs.readdir(rekordbox_path, function(err, files) {
-            if (err) {
-                return console.log('Unable to scan directory: ' + err);
-            }
-            else { /*console.log ("Scanning: " + rekordbox_path);*/ }
+    fs.readdir(rekordbox_path, function(err, files) {
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        else { /*console.log ("Scanning: " + rekordbox_path);*/ }
 
-            files.forEach(function(file) {
-                let result = firstline(path.join(rekordbox_path, file));
+        files.forEach(function(file) {
+            let result = firstline(path.join(rekordbox_path, file));
 
-                result.then(
-                    function(resolve) {
+            result.then(
+                function(resolve) {
 
-                        var array = resolve.split('');
-                        var opening_braces = 0, closing_braces = 0, start_pos = 0, end_pos = 0;
+                    var array = resolve.split('');
+                    var opening_braces = 0, closing_braces = 0, start_pos = 0, end_pos = 0;
 
-                        for (let i = 0; i < array.length; i++) {
-                            if (array[i] == '{') {
-                                opening_braces++;
+                    for (let i = 0; i < array.length; i++) {
+                        if (array[i] == '{') {
+                            opening_braces++;
 
-                                if (opening_braces == 1) {
-                                    start_pos = i;
-                                }
-                            }
-                            if (array[i] == '}') {
-                                closing_braces++;
-                                if (closing_braces == opening_braces) {
-                                    end_pos = i;
-                                    break;
-                                }
+                            if (opening_braces == 1) {
+                                start_pos = i;
                             }
                         }
+                        if (array[i] == '}') {
+                            closing_braces++;
+                            if (closing_braces == opening_braces) {
+                                end_pos = i;
+                                break;
+                            }
+                        }
+                    }
 
-                        if (start_pos == 0 && end_pos == 0) {
-                            return;
-                        }  
+                    if (start_pos == 0 && end_pos == 0) {
+                        return;
+                    }  
 
-                        array.splice(0, start_pos);
-                        array.splice(end_pos, array.length);
+                    array.splice(0, start_pos);
+                    array.splice(end_pos, array.length);
+                    
+                    //var clean = array.join('');
+                    var clean = resolve.substring(start_pos, end_pos+1);
+                    var object = JSON.parse(clean);
+
+                    if (object.id == last_rekordbox_id) {
+                        return;
+                    }
+                    else {
+                        last_rekordbox_id = object.id;
+                        console.log(object);
                         
-                        //var clean = array.join('');
-                        var clean = resolve.substring(start_pos, end_pos+1);
-                        var object = JSON.parse(clean);
+                        var artist = "", title = "";
+                        
+                        for (let i = 0; i < object.artists.length; i++) {
 
-                        if (object.id == last_rekordbox_id) {
-                            return;
-                        }
-                        else {
-                            last_rekordbox_id = object.id;
-                            console.log(object);
-                            
-                            var artist = "", title = "";
-                            
-                            for (let i = 0; i < object.artists.length; i++) {
-
-                                if (i == object.artists.length - 1) {
-                                    artist += object.artists[i].name;
-                                    break;
-                                }
-                                if (i == object.artists.length - 2) {
-                                    artist += object.artists[i].name + " & ";
-                                }
-                                else {
-                                    artist += object.artists[i].name + ", ";
-                                }
+                            if (i == object.artists.length - 1) {
+                                artist += object.artists[i].name;
+                                break;
                             }
-                            if (object.remixers.length > 0) {
-                                title = object.name + ' (' + object.mix_name + ')';
+                            if (i == object.artists.length - 2) {
+                                artist += object.artists[i].name + " & ";
                             }
                             else {
-                                title = object.name;
+                                artist += object.artists[i].name + ", ";
                             }
-
-                            console.log(artist + " - " + title);
                         }
-                        
-                    },
-                    function(error) {
-                        console.log("The promise could not be resolved.");
+                        if (object.remixers.length > 0) {
+                            title = object.name + ' (' + object.mix_name + ')';
+                        }
+                        else {
+                            title = object.name;
+                        }
+
+                        console.log(artist + " - " + title);
+                        document.getElementById('bl_current').innerHTML = artist + " - " + title;
                     }
-                )
-
-                return;
-                
-            });
+                    
+                },
+                function(error) {
+                    console.log("The promise could not be resolved.");
+                }
+            )
+            return;
         });
-
-        if (!is_monitoring) {return;}
-    }, 1000);
+    });
 }
