@@ -10,7 +10,8 @@ const util = require('util');
 const path = require('path');
 const process = require('process');
 
-const rekordbox_module = require('./modules/rekordbox')
+// The Apps's "Classes" aka Modules
+const BeatportLink = require('./modules/beatport-link')
 
 // array to store all tracks in
 var tracks = [];
@@ -22,7 +23,6 @@ var scroll_pos;
 //boolean whether rekordbox should be monitored or not
 var is_monitoring = true;
 var rekordbox_path = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep;
-var last_rekordbox_id = 0;
 
 // load settings file or create it
 try {
@@ -837,7 +837,7 @@ rekordbox_path += path.sep + "tr";
 
 setInterval(function() {
     if (is_monitoring) {
-        rekordbox_module.monitor(rekordbox_path)
+        BeatportLink.monitor(rekordbox_path)
     }
 }, 1000);
 
