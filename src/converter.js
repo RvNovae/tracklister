@@ -104,7 +104,7 @@ function settings_save() {
     //close the settings modal
     DOM.Modal.Close('settings_modal');
     // parse the tracklist again with updated settings
-    updateUI();
+    DOM.UI.Update();
 }
 // this little function ensures that keywords entered by the user can contain special characters
 // otherwise special characters might engage regex syntax
@@ -160,25 +160,6 @@ document.getElementById('erase_btn').addEventListener('click', function() {
     DOM.UI.Reset();
 });
 
-// add event listener for modal backgrounds => close the modal on click 
-Array.from(document.getElementsByClassName('modal-background')).forEach(function(element) {
-    element.addEventListener('click', function() {
-        element.parentNode.classList.remove('is-active');
-    });
-});
-// dragover function (no implementation yet)
-document.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    //open_modal('drop_modal');
-    //console.log(e);
-});
-// dragleave function (no implementation yet)
-document.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    //close_modal('drop_modal');
-});
 
 // determine file type and call file specific function
 function convertFile(input_file) {
@@ -233,37 +214,16 @@ function toggle_dropdown(element, id) {
     element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-up');
 }
 
-// after destructive actions have been performed on the tracklist, 
-// the UI needs to reload to display those changes
-function updateUI() {
-    // save the current scroll location before clearing the screen
-    scroll_pos = window.scrollY;
-    window.scroll(0,0);
-    // reset counter to make sure the numbering is correct
-    var counter = 0;
-    // make sure tracklist and pure_text are blank before written to
-    document.getElementById("tracklist").innerHTML = "";
-    document.getElementById("pure_text").innerHTML = "";
-    // style copy button to convey that the latest changes have not been copied yet
-    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
-    // iterate through tracks array and call writeTrack() to write them to screen and to pure_text
-    tracks.forEach(function (track) {
-        counter++;
-        writeTrack(track, counter);
-    });
-    // apply the scroll location again
-    // apparently chrome is too fast, it doesn't work without the millisecond delay
-    setTimeout(function() {window.scrollTo(0, scroll_pos);},1)
-}
+
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
     tracks.splice(id-1, 1);
-    updateUI();
+    DOM.UI.Update();
 }
 // sets track at id-1 to promo (be careful that counter is always +1, due to js counting from 0)
 function set_promo(element, id) {
     tracks[id-1] = settings.promo;
-    updateUI();
+    DOM.UI.Update();
 }
 // populates the edit modal form with values and opens it
 // sets is_editing to the id of the counter of the track that is being edited,
@@ -311,7 +271,7 @@ function edit_save() {
     is_add_above = false;
     is_add_below = false;
     // refresh the UI
-    updateUI();
+    DOM.UI.Update();
 }
 // function for adding tracks (plus button)
 // because we are reusing the edit modal, saving can be done via the edit_save function
@@ -512,7 +472,7 @@ function move_up(element, id) {
     if (id-1 < 1) {}
     else {
         tracks = arrayMove(tracks, id-1, id-2);
-        updateUI();
+        DOM.UI.Update();
     }
 }
 // if called, it shifts the track one position down in the array
@@ -522,7 +482,7 @@ function move_down(element, id) {
     if (id-1 > tracks.length-1) {}
     else {
         tracks = arrayMove(tracks, id-1, id);
-        updateUI();
+        DOM.UI.Update();
     }
 }
 // this is not a track filter but rather a filter for the counter itself
@@ -557,64 +517,7 @@ function filter_tracknumber(counter) {
 
     return counter
 }
-// this function is responsible for writing tracks to the screen
-function writeTrack(track, counter) {
-    // run the through all the filters
-    track = filter(track, counter);
-    // if it doesn't pass, return 0
-    if (!track) {
-        return 0;
-    }
-    // because the counter might get altered in some way,
-    // we have to use a seperate variable for the one that gets displayed
-    var display_counter = counter;
-    // set track in the array  (this may be redundant, could possibly be removed)
-    tracks[counter-1] = track;
-    // write the visible tracklist in html
-    // this includes the dropdown, containing the options for edit, delete etc.
-    document.getElementById('tracklist').innerHTML += `
-        <div class="dropdown">
-            <div class="dropdown-trigger">
-                <button onclick="toggle_dropdown(this, `+counter+`)" class="button is-small is-white dropdown-trigger-btn" aria-haspopup="true" id="dropdown-`+counter+`">
-                    <span class="icon is-small">
-                        <i class="fas fa-angle-down" aria-hidden="true"></i>
-                    </span>
-                </button>
-            </div>
-            <div class="dropdown-menu" id="dropdown-`+counter+`" role="menu">
-                <div class="dropdown-content">
-                    <a href="#" onclick="delete_track(this, `+counter+`)" class="dropdown-item has-text-danger">
-                        <i class="fas fa-eraser"></i> Delete
-                    </a>
-                    <hr class="dropdown-divider">
-                    <a href="#" onclick="set_promo(this, `+counter+`)" class="dropdown-item has-text-warning">
-                        <i class="fas fa-asterisk"></i> Set to Promo
-                    </a>
-                    <a href="#" onclick="edit_track(this, `+counter+`)" class="dropdown-item">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <hr class="dropdown-divider">
-                    <a href="#" onclick="move_up(this, `+counter+`)" class="dropdown-item">
-                        <i class="fas fa-angle-up"></i> Move Up 
-                    </a>
-                    <a href="#" onclick="move_down(this, `+counter+`)" class="dropdown-item">
-                        <i class="fas fa-angle-down"></i> Move Down
-                    </a>
-                    <hr class="dropdown-divider">
-                    <a href="#" onclick="add_above(` + (counter) + `)" class="dropdown-item">
-                        <i class="fas fa-angle-double-up"></i> Insert 1 above
-                    </a>
-                    <a href="#" onclick="add_below(` + (counter) + `)" class="dropdown-item">
-                        <i class="fas fa-angle-double-down"></i> Insert 1 below
-                    </a>
-                </div>
-            </div>
-        </div>
-    ` + display_counter + '. ' + track + '<br/>';
-    // also write the track to pure_text
-    // pure_text is invisible and is only used to make copying the tracklist easier
-    document.getElementById('pure_text').innerHTML += counter + '. ' + track + '\n';
-}
+
 
 // this function handles .m3u8 files
 // these .m3u8 files must have been exported by Rekordbox 
@@ -653,7 +556,7 @@ function m3u8(input_file) {
             // append the extracted to the tracks array
             tracks.push(track);
             // write the track
-            var ignored = writeTrack(track, counter);
+            var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
             if (ignored == 0) {counter--}
         }
@@ -696,7 +599,7 @@ function csv(input_file) {
             // append the track to the tracks array
             tracks.push(track);
             // write the track
-            var ignored = writeTrack(track, counter);
+            var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
             if (ignored == 0) {counter--}
         }
@@ -732,7 +635,7 @@ function nml(input_file) {
                 track = "###Error, is this file tagged properly?";
             }
             // write track
-            var ignored = writeTrack(track, counter);
+            var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
             if (ignored == 0) {counter--}
         });
@@ -771,7 +674,7 @@ function m3u(input_file) {
                 track = "###Error, is this file tagged properly?";
             }
             // write track
-            var ignored = writeTrack(track, counter);
+            var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
             if (ignored == 0) {counter--}
         }
@@ -799,7 +702,7 @@ function audio(input_file) {
                 track = input_file.replace(/^.*[\\\/]/, '').split('.').slice(0, -1).join('.');
             }
             tracks.push(track);
-            updateUI();
+            DOM.UI.Update();
             console.log(tracks);
         })
         .catch ( err => {
