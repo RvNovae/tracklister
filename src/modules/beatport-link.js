@@ -2,16 +2,19 @@ const PATH = require('path');
 const FIRSTLINE = require('firstline');
 
 var lastID = 0;
-var rekordbox_path = getRekordboxPath();
+var rekordboxPath = getRekordboxPath();
 
 module.export = {
     IsMonitoring = true,
     Start: function() {
         setInterval(function() {
             if (IsMonitoring) {
-                monitor(rekordbox_path);
+                monitor(rekordboxPath);
             }
         }, 1000);
+    },
+    Stop: function(){
+        this.IsMonitoring = false;
     }
 }
 
@@ -41,9 +44,8 @@ function monitor(path) {
                         title = formatTitle(object);
 
                         console.log(artist + " - " + title);
-                        document.getElementById('bl_current').innerHTML = artist + " - " + title;
-                    }
-                    
+                        DOM.Write.Beatport(artist + " - " + title);
+                    }  
                 },
                 function(error) {
                     console.log("The promise could not be resolved: " + error);
@@ -115,10 +117,10 @@ function extractJSON(input) {
 function getRekordboxPath() {
     let temp;
 
-    temp = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep
-    temp += fs.readdirSync(rekordbox_path);
+    temp = process.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
+    temp += fs.readdirSync(rekordboxPath);
     temp += temp[0]
-    temp += path.sep + "tr";
-
+    temp += PATH.sep + "tr";
+    
     return temp;
 }
