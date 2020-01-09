@@ -2,54 +2,60 @@ const PATH = require('path');
 const FIRSTLINE = require('firstline');
 
 var lastID = 0;
+var is_monitoring = true;
+var rekordbox_path = getRekordboxPath();
 
-module.exports = {
-    monitor: function (path) {
-        fs.readdir(path, function(err, files) {
-            if (err) {
-                return console.log('Unable to scan directory: ' + err);
-            }
-            else { /*console.log ("Scanning: " + rekordbox_path);*/ }
-    
-            files.forEach(function(file) {
-                let result = FIRSTLINE(PATH.join(path, file));
-    
-                result.then(
-                    function(resolve) {
-    
-                        var object = JSON.parse(extractJSON(resolve));
-    
-                        if (object.id == lastID) {
-                            return;
-                        }
-                        else {
-                            lastID = object.id;
-                            console.log(object);
-                            
-                            artist = formatArtist(object);
-                            title = formatTitle(object);
-    
-                            console.log(artist + " - " + title);
-                            document.getElementById('bl_current').innerHTML = artist + " - " + title;
-                        }
-                        
-                    },
-                    function(error) {
-                        console.log("The promise could not be resolved: " + error);
-                    }
-                )
-                return;
-            });
-        });
+setInterval(function() {
+    if (is_monitoring) {
+        BeatportLink.Monitor(rekordbox_path);
     }
+}, 1000);
+
+Monitor: function (path) {
+    fs.readdir(path, function(err, files) {
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        else { /*console.log ("Scanning: " + rekordbox_path);*/ }
+
+        files.forEach(function(file) {
+            let result = FIRSTLINE(PATH.join(path, file));
+
+            result.then(
+                function(resolve) {
+
+                    var object = JSON.parse(extractJSON(resolve));
+
+                    if (object.id == lastID) {
+                        return;
+                    }
+                    else {
+                        lastID = object.id;
+                        console.log(object);
+                        
+                        artist = formatArtist(object);
+                        title = formatTitle(object);
+
+                        console.log(artist + " - " + title);
+                        document.getElementById('bl_current').innerHTML = artist + " - " + title;
+                    }
+                    
+                },
+                function(error) {
+                    console.log("The promise could not be resolved: " + error);
+                }
+            )
+            return;
+        });
+    });
 }
 
 function formatTitle(object) {
     if (object.remixers.length > 0) {
-        title = object.name + ' (' + object.mix_name + ')';
+        return object.name + ' (' + object.mix_name + ')';
     }
     else {
-        title = object.name;
+        return object.name;
     }
 }
 
@@ -100,4 +106,15 @@ function extractJSON(input) {
     array.splice(end_pos, array.length);
     
     return resolve.substring(start_pos, end_pos+1);
+}
+
+function getRekordboxPath() {
+    let temp;
+
+    temp = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep
+    temp += fs.readdirSync(rekordbox_path);
+    temp += temp[0]
+    temp += path.sep + "tr";
+
+    return temp;
 }

@@ -20,10 +20,6 @@ var settings = {};
 var is_editing, is_adding, is_add_above, is_add_below;
 var scroll_pos;
 
-//boolean whether rekordbox should be monitored or not
-var is_monitoring = true;
-var rekordbox_path = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep;
-
 // load settings file or create it
 try {
     settings_load();
@@ -830,14 +826,4 @@ function audio(input_file) {
             console.error(err.message);
         })
 }
-
-var temp = fs.readdirSync(rekordbox_path);
-rekordbox_path += temp[0]
-rekordbox_path += path.sep + "tr";
-
-setInterval(function() {
-    if (is_monitoring) {
-        BeatportLink.monitor(rekordbox_path)
-    }
-}, 1000);
 
