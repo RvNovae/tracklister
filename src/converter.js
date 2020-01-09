@@ -11,7 +11,9 @@ const path = require('path');
 const process = require('process');
 
 // The Apps's "Classes" aka Modules
-const BeatportLink = require('./modules/beatport-link')
+const BeatportLink = require('./modules/beatport-link');
+
+BeatportLink.Start();
 
 // array to store all tracks in
 var tracks = [];

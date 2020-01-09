@@ -5,13 +5,17 @@ var lastID = 0;
 var is_monitoring = true;
 var rekordbox_path = getRekordboxPath();
 
-setInterval(function() {
-    if (is_monitoring) {
-        BeatportLink.Monitor(rekordbox_path);
+module.export = {
+    Start: function() {
+        setInterval(function() {
+            if (is_monitoring) {
+                monitor(rekordbox_path);
+            }
+        }, 1000);
     }
-}, 1000);
+}
 
-Monitor: function (path) {
+function monitor(path) {
     fs.readdir(path, function(err, files) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
