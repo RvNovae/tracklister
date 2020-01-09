@@ -13,6 +13,7 @@ const process = require('process');
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
+const Settings = require('./modules/settings');
 
 BeatportLink.Start();
 
@@ -113,7 +114,7 @@ RegExp.escape = function(string) {
 // Check for passed arguments (Open with tracklister.exe)
 remote.process.argv.forEach(function(argument) {
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
-        setUI();
+        DOM.UI.Set();
         console.log(argument);
         convertFile(argument);
     }
@@ -124,7 +125,7 @@ document.addEventListener('drop', (e) => {
     e.stopPropagation();
     // clear / prepare the UI
     console.log(e);
-    setUI();
+    DOM.UI.Set();
     // get file object from drop
     for (const f of e.dataTransfer.files) {
         // start the conversion process
@@ -147,22 +148,6 @@ document.addEventListener('keyup', function(e) {
     }
 });
 
-// clear and prepare the UI / copy button gets activated
-function setUI() {
-    document.getElementById("copy_btn").disabled = false;
-    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
-    document.getElementById("tracklist").innerHTML = "";
-    document.getElementById("pure_text").innerHTML = "";
-    //tracks.length = 0;
-}
-// clear and prepare the UI / copy button gets deactivated
-function resetUI() {
-    document.getElementById("copy_btn").disabled = true;
-    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
-    document.getElementById("tracklist").innerHTML = "";
-    document.getElementById("pure_text").innerHTML = "";
-    //tracks.length = 0;
-}
 // add event listener for the copy button
 document.getElementById('copy_btn').addEventListener('click', function() {
     // copy text from pure text element to the clipboard
@@ -172,7 +157,7 @@ document.getElementById('copy_btn').addEventListener('click', function() {
 });
 document.getElementById('erase_btn').addEventListener('click', function() {
     tracks.length = 0;
-    resetUI();
+    DOM.UI.Reset();
 });
 
 // add event listener for modal backgrounds => close the modal on click 
@@ -227,7 +212,7 @@ function convertFile(input_file) {
             break;
         default:
             alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
-            resetUI();
+            DOM.UI.Reset();
             break;
     }
 }

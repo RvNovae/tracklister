@@ -10,8 +10,8 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-      width: 700,
-      height: 900,
+      width: 650,
+      height: 850,
       title: "Tracklister " + app.getVersion(),
       webPreferences: {
         preload: path.join(__dirname, 'src/preload.js'),

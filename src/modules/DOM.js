@@ -10,5 +10,19 @@ module.exports = {
         Open: function(id) {
             document.getElementById(id).classList.add('is-active');
         }
+    },
+    UI: {
+        Set: function() {
+            document.getElementById("copy_btn").disabled = false;
+            document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
+            document.getElementById("tracklist").innerHTML = "";
+            document.getElementById("pure_text").innerHTML = "";
+        },
+        Reset: function() {
+            document.getElementById("copy_btn").disabled = true;
+            document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
+            document.getElementById("tracklist").innerHTML = "";
+            document.getElementById("pure_text").innerHTML = "";
+        }
     }
 }
