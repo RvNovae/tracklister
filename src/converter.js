@@ -1,8 +1,9 @@
 const fs = require('fs');
 const readline = require('readline');
-const { app, shell } = require('electron');
+const { clipboard, app, shell } = require('electron');
 const xml_js = require('xml-js');
 const arrayMove = require('array-move');
+const storage = require('electron-json-storage');
 const remote = require('electron').remote;
 const mm = require('music-metadata');
 const util = require('util');
@@ -11,18 +12,98 @@ const process = require('process');
 
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');
-const Settings = require('./modules/settings');
-const DOM = require('./modules/DOM');
 
 BeatportLink.Start();
-Settings.Start();
+
 // array to store all tracks in
 var tracks = [];
-
+var settings = {};
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
 var scroll_pos;
 
+// load settings file or create it
+try {
+    settings_load();
+}
+catch {
+    settings_reset();
+}
+
+settings_reset();
+// load settings from settings file into the settings menu
+function settings_load() {
+    // check if settings file exists / create it if it doesn't exist
+    fs.access(storage.getDataPath('settings'), (err) => {
+        if (err) {
+            settings_reset();
+            return;
+        }
+        // load settings
+        storage.get('settings', function(err, data) {
+            if (err) throw error;
+            settings = data;
+            // populate settings form
+            document.getElementById('settings_promo_input').value = settings.promo;
+            document.getElementById('settings_ignore_switch').checked = settings.ignore.switch;
+            document.getElementById('settings_ignore_input').value = settings.ignore.keywords;
+            document.getElementById('settings_omit_switch').checked = settings.omit.switch;
+            document.getElementById('settings_omit_input').value = settings.omit.keywords;
+            document.getElementById('settings_syntax_fixer_switch').checked = settings.syntax.switch;
+            document.getElementById('settings_featuring_selector').value = settings.syntax.featuring;
+            document.getElementById('settings_versus_selector').value = settings.syntax.versus;
+            document.getElementById('settings_and_selector').value = settings.syntax.and;
+            document.getElementById('settings_featured_fixer_switch').checked = settings.featured_fix.switch;
+        });
+    });
+}
+// set default settings and save them to the disk
+function settings_reset() {
+    settings.promo = 'Unknown Artist - Unknown Title';
+    settings.ignore = {};
+    settings.ignore.switch = false;
+    settings.ignore.keywords = '';
+    settings.syntax = {};
+    settings.syntax.switch = false;
+    settings.syntax.featuring = '';
+    settings.syntax.versus = '';
+    settings.syntax.and = '';
+    settings.featured_fix = {};
+    settings.featured_fix.switch = false;
+    settings.omit = {}
+    settings.omit.switch = false;
+    settings.omit.keywords = '';
+   
+    // save settings to file
+    storage.set('settings', settings, function(err) {
+        if (err) throw error;   
+    });
+    // load settings after they have been set
+    settings_load();
+}
+// save settings after they have been modified by the user
+function settings_save() {
+    // grab values from the settings form
+    settings.promo = document.getElementById('settings_promo_input').value;
+    settings.ignore.switch = document.getElementById('settings_ignore_switch').checked;
+    settings.ignore.keywords = document.getElementById('settings_ignore_input').value;
+    settings.syntax.switch = document.getElementById('settings_syntax_fixer_switch').checked;
+    settings.syntax.featuring = document.getElementById('settings_featuring_selector').value;
+    settings.syntax.versus = document.getElementById('settings_versus_selector').value;
+    settings.syntax.and = document.getElementById('settings_and_selector').value;
+    settings.featured_fix.switch = document.getElementById('settings_featured_fixer_switch').checked;
+    settings.omit.switch = document.getElementById('settings_omit_switch').checked;
+    settings.omit.keywords = document.getElementById('settings_omit_input').value;
+
+    // save settings to disk
+    storage.set('settings', settings, function(err) {
+        if (err) throw error;
+    });
+    //close the settings modal
+    close_modal('settings_modal');
+    // parse the tracklist again with updated settings
+    updateUI();
+}
 // this little function ensures that keywords entered by the user can contain special characters
 // otherwise special characters might engage regex syntax
 RegExp.escape = function(string) {
@@ -36,11 +117,74 @@ remote.process.argv.forEach(function(argument) {
         convertFile(argument);
     }
 });
+// listen for file drop
+document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // clear / prepare the UI
+    console.log(e);
+    setUI();
+    // get file object from drop
+    for (const f of e.dataTransfer.files) {
+        // start the conversion process
+        convertFile(f.path);
+    }
+});
+// handle key inputs
+document.addEventListener('keyup', function(e) {
+    if (e.key === "Escape") {
+        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
+            close_modal(elem.id);
+        });
+    }
+    if (e.key === "Enter") {
+        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
+            if (elem.classList.contains('is-active')) {
+                elem.getElementsByClassName('submit')[0].click();
+            }
+        });
+    }
+});
 
+// clear and prepare the UI / copy button gets activated
+function setUI() {
+    document.getElementById("copy_btn").disabled = false;
+    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
+    document.getElementById("tracklist").innerHTML = "";
+    document.getElementById("pure_text").innerHTML = "";
+    //tracks.length = 0;
+}
+// clear and prepare the UI / copy button gets deactivated
+function resetUI() {
+    document.getElementById("copy_btn").disabled = true;
+    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
+    document.getElementById("tracklist").innerHTML = "";
+    document.getElementById("pure_text").innerHTML = "";
+    //tracks.length = 0;
+}
 // add event listener for the copy button
-
+document.getElementById('copy_btn').addEventListener('click', function() {
+    // copy text from pure text element to the clipboard
+    clipboard.writeText(document.getElementById('pure_text').innerText);
+    // change the copy button apperance => opaque icon ("has been copied!")
+    this.innerHTML = '<i class="fas fa-copy"></i>';
+});
+document.getElementById('erase_btn').addEventListener('click', function() {
+    tracks.length = 0;
+    resetUI();
+});
 // generic function to close modal of id
-
+function close_modal(id) {
+    document.getElementById(id).classList.remove('is-active');
+    // the modal resets the scroll position, when opened for some reason
+    // still looking for a way to prevent that, it's quite distracting
+    // for now we just reset it after the modal is closed
+    window.scrollTo(0, scroll_pos);
+}
+// generic function to open modal of id
+function open_modal(id) {
+    document.getElementById(id).classList.add('is-active');
+}
 // add event listener for modal backgrounds => close the modal on click 
 Array.from(document.getElementsByClassName('modal-background')).forEach(function(element) {
     element.addEventListener('click', function() {
@@ -93,7 +237,7 @@ function convertFile(input_file) {
             break;
         default:
             alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
-            DOM.UI.Reset();
+            resetUI();
             break;
     }
 }
@@ -112,6 +256,29 @@ function toggle_dropdown(element, id) {
     element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-down');
     // toggle up arrow
     element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-up');
+}
+
+// after destructive actions have been performed on the tracklist, 
+// the UI needs to reload to display those changes
+function updateUI() {
+    // save the current scroll location before clearing the screen
+    scroll_pos = window.scrollY;
+    window.scroll(0,0);
+    // reset counter to make sure the numbering is correct
+    var counter = 0;
+    // make sure tracklist and pure_text are blank before written to
+    document.getElementById("tracklist").innerHTML = "";
+    document.getElementById("pure_text").innerHTML = "";
+    // style copy button to convey that the latest changes have not been copied yet
+    document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
+    // iterate through tracks array and call writeTrack() to write them to screen and to pure_text
+    tracks.forEach(function (track) {
+        counter++;
+        writeTrack(track, counter);
+    });
+    // apply the scroll location again
+    // apparently chrome is too fast, it doesn't work without the millisecond delay
+    setTimeout(function() {window.scrollTo(0, scroll_pos);},1)
 }
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
@@ -664,4 +831,3 @@ function audio(input_file) {
             console.error(err.message);
         })
 }
-

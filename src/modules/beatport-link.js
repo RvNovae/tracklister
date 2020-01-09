@@ -1,35 +1,43 @@
 const PATH = require('path');
 const FIRSTLINE = require('firstline');
+const FS = require('fs');
 
 var lastID = 0;
 var rekordboxPath = getRekordboxPath();
+var isMonitoring = false;
 
-module.export = {
-    IsMonitoring = true,
+module.exports = {
+    IsMonitoring: isMonitoring,
     Start: function() {
+        isMonitoring = true;
         setInterval(function() {
-            if (IsMonitoring) {
+            if (isMonitoring) {
+                
                 monitor(rekordboxPath);
             }
         }, 1000);
     },
-    Stop: function(){
-        this.IsMonitoring = false;
+    Stop: function() {
+        isMonitoring = false;
     }
 }
 
 function monitor(path) {
-    fs.readdir(path, function(err, files) {
+    FS.readdir(path, function(err, files) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
-        else { /*console.log ("Scanning: " + rekordbox_path);*/ }
+        else { /*console.log ("Scanning: " + rekordboxPath);*/ }
 
         files.forEach(function(file) {
             let result = FIRSTLINE(PATH.join(path, file));
 
             result.then(
                 function(resolve) {
+
+                    if (typeof extractJSON(resolve) == 'undefined') {
+                        return;
+                    }
 
                     var object = JSON.parse(extractJSON(resolve));
 
@@ -44,8 +52,9 @@ function monitor(path) {
                         title = formatTitle(object);
 
                         console.log(artist + " - " + title);
-                        DOM.Write.Beatport(artist + " - " + title);
-                    }  
+                        document.getElementById('bl_current').innerHTML = artist + " - " + title;
+                    }
+                    
                 },
                 function(error) {
                     console.log("The promise could not be resolved: " + error);
@@ -66,7 +75,7 @@ function formatTitle(object) {
 }
 
 function formatArtist(object) {
-    let artist;
+    let artist = "";
     for (let i = 0; i < object.artists.length; i++) {
     
         if (i == object.artists.length - 1) {
@@ -111,16 +120,15 @@ function extractJSON(input) {
     array.splice(0, start_pos);
     array.splice(end_pos, array.length);
     
-    return resolve.substring(start_pos, end_pos+1);
+    return input.substring(start_pos, end_pos+1);
 }
 
 function getRekordboxPath() {
     let temp;
 
-    temp = process.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
-    temp += fs.readdirSync(rekordboxPath);
-    temp += temp[0]
-    temp += PATH.sep + "tr";
-    
+    temp = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep
+    temp += FS.readdirSync(temp)[0];
+    temp += path.sep + "tr";
+
     return temp;
 }
