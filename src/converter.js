@@ -12,6 +12,7 @@ const process = require('process');
 
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');
+const DOM = require('./modules/DOM');
 
 BeatportLink.Start();
 
@@ -100,7 +101,7 @@ function settings_save() {
         if (err) throw error;
     });
     //close the settings modal
-    close_modal('settings_modal');
+    DOM.Modal.Close('settings_modal');
     // parse the tracklist again with updated settings
     updateUI();
 }
@@ -134,7 +135,7 @@ document.addEventListener('drop', (e) => {
 document.addEventListener('keyup', function(e) {
     if (e.key === "Escape") {
         Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
-            close_modal(elem.id);
+            DOM.Modal.Close(elem.id);
         });
     }
     if (e.key === "Enter") {
@@ -173,18 +174,7 @@ document.getElementById('erase_btn').addEventListener('click', function() {
     tracks.length = 0;
     resetUI();
 });
-// generic function to close modal of id
-function close_modal(id) {
-    document.getElementById(id).classList.remove('is-active');
-    // the modal resets the scroll position, when opened for some reason
-    // still looking for a way to prevent that, it's quite distracting
-    // for now we just reset it after the modal is closed
-    window.scrollTo(0, scroll_pos);
-}
-// generic function to open modal of id
-function open_modal(id) {
-    document.getElementById(id).classList.add('is-active');
-}
+
 // add event listener for modal backgrounds => close the modal on click 
 Array.from(document.getElementsByClassName('modal-background')).forEach(function(element) {
     element.addEventListener('click', function() {
@@ -296,7 +286,7 @@ function set_promo(element, id) {
 function edit_track(element, id) {
     document.getElementById('edit_input').value = tracks[id-1];
     is_editing = id;
-    open_modal('edit_modal');
+    DOM.Modal.Open('edit_modal');
     document.getElementById('edit_input').focus();
 }
 // save the the edited / added data at the desired location, close the edit modal and reload the UI
@@ -331,7 +321,7 @@ function edit_save() {
         tracks[is_editing-1] = document.getElementById('edit_input').value;
     }
     // close the modal and reset all the flags
-    close_modal('edit_modal');
+    DOM.Modal.Close('edit_modal');
     is_adding = false;
     is_add_above = false;
     is_add_below = false;
@@ -351,7 +341,7 @@ function add_track(id) {
         is_editing = id;
         console.log('is_editing:' + id);
     }
-    open_modal('edit_modal');
+    DOM.Modal.Open('edit_modal');
     document.getElementById('edit_input').focus();
 }
 function add_above(id) {
