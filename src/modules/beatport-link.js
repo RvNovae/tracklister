@@ -2,13 +2,13 @@ const PATH = require('path');
 const FIRSTLINE = require('firstline');
 
 var lastID = 0;
-var is_monitoring = true;
 var rekordbox_path = getRekordboxPath();
 
 module.export = {
+    IsMonitoring = true,
     Start: function() {
         setInterval(function() {
-            if (is_monitoring) {
+            if (IsMonitoring) {
                 monitor(rekordbox_path);
             }
         }, 1000);
