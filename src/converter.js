@@ -14,98 +14,16 @@ const process = require('process');
 const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
 const Settings = require('./modules/settings');
+const Data = require('./modules/data');
 
 BeatportLink.Start();
+Settings.Start();
 
-// array to store all tracks in
-var tracks = [];
-var settings = {};
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
 var scroll_pos;
 
-// load settings file or create it
-try {
-    settings_load();
-}
-catch {
-    settings_reset();
-}
 
-settings_reset();
-// load settings from settings file into the settings menu
-function settings_load() {
-    // check if settings file exists / create it if it doesn't exist
-    fs.access(storage.getDataPath('settings'), (err) => {
-        if (err) {
-            settings_reset();
-            return;
-        }
-        // load settings
-        storage.get('settings', function(err, data) {
-            if (err) throw error;
-            settings = data;
-            // populate settings form
-            document.getElementById('settings_promo_input').value = settings.promo;
-            document.getElementById('settings_ignore_switch').checked = settings.ignore.switch;
-            document.getElementById('settings_ignore_input').value = settings.ignore.keywords;
-            document.getElementById('settings_omit_switch').checked = settings.omit.switch;
-            document.getElementById('settings_omit_input').value = settings.omit.keywords;
-            document.getElementById('settings_syntax_fixer_switch').checked = settings.syntax.switch;
-            document.getElementById('settings_featuring_selector').value = settings.syntax.featuring;
-            document.getElementById('settings_versus_selector').value = settings.syntax.versus;
-            document.getElementById('settings_and_selector').value = settings.syntax.and;
-            document.getElementById('settings_featured_fixer_switch').checked = settings.featured_fix.switch;
-        });
-    });
-}
-// set default settings and save them to the disk
-function settings_reset() {
-    settings.promo = 'Unknown Artist - Unknown Title';
-    settings.ignore = {};
-    settings.ignore.switch = false;
-    settings.ignore.keywords = '';
-    settings.syntax = {};
-    settings.syntax.switch = false;
-    settings.syntax.featuring = '';
-    settings.syntax.versus = '';
-    settings.syntax.and = '';
-    settings.featured_fix = {};
-    settings.featured_fix.switch = false;
-    settings.omit = {}
-    settings.omit.switch = false;
-    settings.omit.keywords = '';
-   
-    // save settings to file
-    storage.set('settings', settings, function(err) {
-        if (err) throw error;   
-    });
-    // load settings after they have been set
-    settings_load();
-}
-// save settings after they have been modified by the user
-function settings_save() {
-    // grab values from the settings form
-    settings.promo = document.getElementById('settings_promo_input').value;
-    settings.ignore.switch = document.getElementById('settings_ignore_switch').checked;
-    settings.ignore.keywords = document.getElementById('settings_ignore_input').value;
-    settings.syntax.switch = document.getElementById('settings_syntax_fixer_switch').checked;
-    settings.syntax.featuring = document.getElementById('settings_featuring_selector').value;
-    settings.syntax.versus = document.getElementById('settings_versus_selector').value;
-    settings.syntax.and = document.getElementById('settings_and_selector').value;
-    settings.featured_fix.switch = document.getElementById('settings_featured_fixer_switch').checked;
-    settings.omit.switch = document.getElementById('settings_omit_switch').checked;
-    settings.omit.keywords = document.getElementById('settings_omit_input').value;
-
-    // save settings to disk
-    storage.set('settings', settings, function(err) {
-        if (err) throw error;
-    });
-    //close the settings modal
-    DOM.Modal.Close('settings_modal');
-    // parse the tracklist again with updated settings
-    DOM.UI.Update();
-}
 // this little function ensures that keywords entered by the user can contain special characters
 // otherwise special characters might engage regex syntax
 RegExp.escape = function(string) {
@@ -156,7 +74,7 @@ document.getElementById('copy_btn').addEventListener('click', function() {
     this.innerHTML = '<i class="fas fa-copy"></i>';
 });
 document.getElementById('erase_btn').addEventListener('click', function() {
-    tracks.length = 0;
+    Data.Tracks.length = 0;
     DOM.UI.Reset();
 });
 
@@ -217,19 +135,19 @@ function toggle_dropdown(element, id) {
 
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
-    tracks.splice(id-1, 1);
+    Data.Tracks.splice(id-1, 1);
     DOM.UI.Update();
 }
 // sets track at id-1 to promo (be careful that counter is always +1, due to js counting from 0)
 function set_promo(element, id) {
-    tracks[id-1] = settings.promo;
+    Data.Tracks[id-1] = Settings.settings.promo;
     DOM.UI.Update();
 }
 // populates the edit modal form with values and opens it
 // sets is_editing to the id of the counter of the track that is being edited,
 // this just makes saving the data easier
 function edit_track(element, id) {
-    document.getElementById('edit_input').value = tracks[id-1];
+    document.getElementById('edit_input').value = Data.Tracks[id-1];
     is_editing = id;
     DOM.Modal.Open('edit_modal');
     document.getElementById('edit_input').focus();
@@ -246,24 +164,24 @@ function edit_save() {
         if (is_add_above) {desired_location = is_editing-1}
         if (is_add_below) {desired_location = is_editing}
         // if neither add above or add below is specified, it will simply be appended
-        if(!is_add_above && !is_add_below) {desired_location = tracks.length}
+        if(!is_add_above && !is_add_below) {desired_location = Data.Tracks.length}
         // iterate through the tracks array
         // shift all entries after the desired location down by one
-        for (let i = 0; i < tracks.length; i++) {
+        for (let i = 0; i < Data.Tracks.length; i++) {
             if (i >= desired_location) {
-                temp_tracks[i+1] = tracks[i];
+                temp_tracks[i+1] = Data.Tracks[i];
             }
             // keep all entries before the desired location
-            else {temp_tracks[i] = tracks[i];}
+            else {temp_tracks[i] = Data.Tracks[i];}
         }
         // assign the added track to the "now free" index
         temp_tracks[desired_location] = document.getElementById('edit_input').value;
         // apply the temporary array
-        tracks = temp_tracks;
+        Data.Tracks = temp_tracks;
     }
     // apply the edited value to the original value in the array
     else {
-        tracks[is_editing-1] = document.getElementById('edit_input').value;
+        Data.Tracks[is_editing-1] = document.getElementById('edit_input').value;
     }
     // close the modal and reset all the flags
     DOM.Modal.Close('edit_modal');
@@ -280,7 +198,7 @@ function add_track(id) {
     is_adding = true;
     document.getElementById('edit_input').value = "";
     if (id == 'new') {
-        is_editing = tracks.length+1;
+        is_editing = Data.Tracks.length+1;
     }
     else {
         is_editing = id;
@@ -302,17 +220,17 @@ function add_below(id) {
 function filter_ignore(track, counter) {
     try {
         // If this setting is disabled, return true / let the track pass
-        if (!settings.ignore.switch) {
+        if (!Settings.settings.ignore.switch) {
             return true;
         }
         // check if the keywords string contains any seperators (',')
-        if (RegExp(',').test(RegExp.escape(settings.ignore.keywords))) {
+        if (RegExp(',').test(RegExp.escape(Settings.settings.ignore.keywords))) {
             // split the list of keywords by ',' and iterate through them
-            settings.ignore.keywords.split(',').forEach(function (keyword) {
+            Settings.settings.ignore.keywords.split(',').forEach(function (keyword) {
                 // check if keyword is found in track name
                 if ((new RegExp(RegExp.escape(keyword), 'gi')).test(track)) {
                     // if a match is found => remove track from array and return false
-                    tracks.splice(counter-1, 1);
+                    Data.Tracks.splice(counter-1, 1);
                     return false;
                 }
             });
@@ -320,7 +238,7 @@ function filter_ignore(track, counter) {
         // do this if no seperators (',') have been found in the keywords string
         else {
             // if keywords string is empty, let the track pass
-            if (settings.ignore.keywords == '') {
+            if (Settings.settings.ignore.keywords == '') {
                 return true;
             }
             // if the keywords string is not empty
@@ -328,8 +246,8 @@ function filter_ignore(track, counter) {
             // check against the keyword
             else {
                 // if a match is, remove the track from the array and let the track fail
-                if ((new RegExp(RegExp.escape(settings.ignore.keywords), 'gi')).test(track)) {
-                    tracks.splice(counter-1, 1);
+                if ((new RegExp(RegExp.escape(Settings.settings.ignore.keywords), 'gi')).test(track)) {
+                    Data.Tracks.splice(counter-1, 1);
                     return false;
                 }
                 // if no matches are found, let the track pass
@@ -348,30 +266,30 @@ function filter_ignore(track, counter) {
 function filter_syntax(track) {
     try {
         // if this setting is turned off => return the unmodified track
-        if (!settings.syntax.switch) {
+        if (!Settings.settings.syntax.switch) {
             return track;
         }
         // if the 'featuring' string is not empty =>
         // find and replace all instances with the set preference
         // try and catch are necessary in case it can't find any instances of these conventions
         // => save changes to the track variable
-        if (settings.syntax.featuring != '') {
+        if (Settings.settings.syntax.featuring != '') {
             try{
-                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + settings.syntax.featuring + ' ');
+                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + Settings.settings.syntax.featuring + ' ');
             }
             catch {}
         }
         // same for the 'versus' string
-        if (settings.syntax.versus != '') {
+        if (Settings.settings.syntax.versus != '') {
             try {
-                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + settings.syntax.versus + ' ');
+                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + Settings.settings.syntax.versus + ' ');
             }
             catch {}
         }
         // same for the 'AND' string
-        if (settings.syntax.and != '') {
+        if (Settings.settings.syntax.and != '') {
             try {
-                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + settings.syntax.and + ' ');
+                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + Settings.settings.syntax.and + ' ');
             }
             catch {}
         }
@@ -387,7 +305,7 @@ function filter_syntax(track) {
 function filter_feature_fix(track) {
     // return unmodified track, if turned off
     try {
-        if (!settings.featured_fix.switch) {
+        if (!Settings.settings.featured_fix.switch) {
             return track;
         }
         // split track into artist and title column by looking for the ' - ' string
@@ -418,18 +336,18 @@ function filter_feature_fix(track) {
 function filter_omit(track) {
     try {
         // return unmodified track if setting is turned off
-        if (!settings.omit.switch) {
+        if (!Settings.settings.omit.switch) {
             return track;
         }
         else {
             // return unmodified track if the keyword list is empty
-            if (settings.omit.keywords == '') {
+            if (Settings.settings.omit.keywords == '') {
                 return track;
             }
             else {
                 try {
                     // split the keywords string at (',') and iterate through them
-                    settings.omit.keywords.split(',').forEach(function(keyword) {
+                    Settings.settings.omit.keywords.split(',').forEach(function(keyword) {
                         // if a match is found it will be replaced with an empty string
                         track = track.replace(RegExp(RegExp.escape(keyword), 'gi'), '');
                     });
@@ -439,7 +357,7 @@ function filter_omit(track) {
                 // if no seperator has been found, assume there is only one keyword
                 catch {
                     // if a match is found it will be replaced with an empty string
-                    track = track.replace(RegExp(RegExp.escape(settings.omit.keywords), 'gi'), '');
+                    track = track.replace(RegExp(RegExp.escape(Settings.settings.omit.keywords), 'gi'), '');
                     return track;
                 }
             }
@@ -457,7 +375,7 @@ function filter(track, id) {
     track = filter_omit(track);
     // if the track passes, save it to the array and return it
     if (filter_ignore(track, id)) {
-        tracks[id-1] = track;
+        Data.Tracks[id-1] = track;
         return track;
     }
     // if the track does not pass, return false
@@ -471,7 +389,7 @@ function move_up(element, id) {
     // make sure the element isn't the first
     if (id-1 < 1) {}
     else {
-        tracks = arrayMove(tracks, id-1, id-2);
+        Data.Tracks = arrayMove(Data.Tracks, id-1, id-2);
         DOM.UI.Update();
     }
 }
@@ -479,20 +397,20 @@ function move_up(element, id) {
 // => refresh the UI afterwards
 function move_down(element, id) {
     // make sure the element isn't the last
-    if (id-1 > tracks.length-1) {}
+    if (id-1 > Data.Tracks.length-1) {}
     else {
-        tracks = arrayMove(tracks, id-1, id);
+        Data.Tracks = arrayMove(Data.Tracks, id-1, id);
         DOM.UI.Update();
     }
 }
 // this is not a track filter but rather a filter for the counter itself
 // hence it's strange placement
 function filter_tracknumber(counter) {
-    if (settings.tracknumber.switch) {
+    if (Settings.settings.tracknumber.switch) {
         var counter_digits;
         var highest_digits;
         var temp_counter = counter;
-        var temp_tracklength = tracks.length;
+        var temp_tracklength = Data.Tracks.length;
 
         if (counter >= 1) ++counter_digits;
 
@@ -501,7 +419,7 @@ function filter_tracknumber(counter) {
             ++counter_digits;
         }
 
-        if (tracks.length >= 1) ++highest_digits;
+        if (Data.Tracks.length >= 1) ++highest_digits;
 
         while(temp_tracklength / 10 >= 1) {
             temp_tracklength /= 10;
@@ -554,7 +472,7 @@ function m3u8(input_file) {
                 track = "###Error, is this file tagged properly?";
             }
             // append the extracted to the tracks array
-            tracks.push(track);
+            Data.Tracks.push(track);
             // write the track
             var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
@@ -597,7 +515,7 @@ function csv(input_file) {
                 track = "###Error, is this file tagged properly?";
             }
             // append the track to the tracks array
-            tracks.push(track);
+            Data.Tracks.push(track);
             // write the track
             var ignored = DOM.Write.Track(track, counter);
             // if it does not pass, the counter has to be decreased to account for the missing track
@@ -701,9 +619,9 @@ function audio(input_file) {
             else {
                 track = input_file.replace(/^.*[\\\/]/, '').split('.').slice(0, -1).join('.');
             }
-            tracks.push(track);
+            Data.Tracks.push(track);
             DOM.UI.Update();
-            console.log(tracks);
+            console.log(Data.Tracks);
         })
         .catch ( err => {
             console.error(err.message);
