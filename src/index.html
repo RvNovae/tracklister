@@ -26,14 +26,14 @@
         <hr>
         <div id="tracklist"></div>
         <div id="pure_text"></div>
-        <footer class="footer">
+        <!-- <footer class="footer">
             <button class="button is-white is-small" id="add_bl_btn">
                 <span class="icon is-small">
                     <i class="fas fa-plus"></i>
                 </span>
             </button>
             <span id="bl_current"></span>
-        </footer>
+        </footer> -->
         <div class="modal" id="drop_modal">
                 <div class="modal-background"></div>
                 <center>
@@ -155,7 +155,7 @@
                 <div class="modal-card-body">
                     <button class="button is-small is-white is-pulled-right" onclick="DOM.Modal.Close('settings_modal')">Close</button>
                     <p class="title is-3">Settings <p class="subtitle is-5">Please refer to Help menu!</p></p>
-                    <a class="button is-small has-text-danger" onclick="settings_reset()" id="reset_btn">Reset</a>
+                    <a class="button is-small has-text-danger" onclick="Settings.Reset()" id="reset_btn">Reset</a>
                     <hr>
                     <label>Promo Syntax</label>
                     <input class="input" id="settings_promo_input" type="text" placeholder="ID - ID">
@@ -177,7 +177,7 @@
                     <hr>
                     <label><input id="settings_featured_fixer_switch" type="checkbox"> Fix featured artists</label>
                     <hr>
-                    <a class="button submit is-link is-fullwidth" onclick="settings_save()" id="save_submit">Save</a>
+                    <a class="button submit is-link is-fullwidth" onclick="Settings.Save()" id="save_submit">Save</a>
                 </div> 
             </div>
         </div>
