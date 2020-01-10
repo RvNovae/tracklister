@@ -1,3 +1,5 @@
+const Data = require('./data');
+
 Modal = {
     Close: function(id){
         document.getElementById(id).classList.remove('is-active');
@@ -17,12 +19,14 @@ UI = {
         document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
         document.getElementById("tracklist").innerHTML = "";
         document.getElementById("pure_text").innerHTML = "";
+        Data.Tracks.length = 0;
     },
     Reset: function() {
         document.getElementById("copy_btn").disabled = true;
         document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
         document.getElementById("tracklist").innerHTML = "";
         document.getElementById("pure_text").innerHTML = "";
+        Data.Tracks.length = 0;
     },
     Update: function() {
         // save the current scroll location before clearing the screen
@@ -33,10 +37,13 @@ UI = {
         // make sure tracklist and pure_text are blank before written to
         document.getElementById("tracklist").innerHTML = "";
         document.getElementById("pure_text").innerHTML = "";
+
+        console.log(Data.Tracks);
+
         // style copy button to convey that the latest changes have not been copied yet
         document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
         // iterate through tracks array and call writeTrack() to write them to screen and to pure_text
-        tracks.forEach(function (track) {
+        Data.Tracks.forEach(function (track) {
             counter++;
             Write.Track(track, counter);
         });
@@ -59,7 +66,7 @@ Write = {
         // we have to use a seperate variable for the one that gets displayed
         var display_counter = counter;
         // set track in the array  (this may be redundant, could possibly be removed)
-        tracks[counter-1] = track;
+        Data.Tracks[counter-1] = track;
         // write the visible tracklist in html
         // this includes the dropdown, containing the options for edit, delete etc.
         document.getElementById('tracklist').innerHTML += `
