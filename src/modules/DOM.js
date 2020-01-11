@@ -1,4 +1,5 @@
 const Data = require('./data');
+window.scrollPos = 0;
 
 Modal = {
     Close: function(id){
@@ -6,7 +7,7 @@ Modal = {
         // the modal resets the scroll position, when opened for some reason
         // still looking for a way to prevent that, it's quite distracting
         // for now we just reset it after the modal is closed
-        window.scrollTo(0, scroll_pos);
+        window.scrollTo(0, window.scrollPos);
     },
     Open: function(id) {
         document.getElementById(id).classList.add('is-active');
@@ -30,15 +31,13 @@ UI = {
     },
     Update: function() {
         // save the current scroll location before clearing the screen
-        scroll_pos = window.scrollY;
+        window.scrollPos = window.scrollY;
         window.scroll(0,0);
         // reset counter to make sure the numbering is correct
         var counter = 0;
         // make sure tracklist and pure_text are blank before written to
         document.getElementById("tracklist").innerHTML = "";
         document.getElementById("pure_text").innerHTML = "";
-
-        console.log(Data.Tracks);
 
         // style copy button to convey that the latest changes have not been copied yet
         document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
@@ -49,7 +48,7 @@ UI = {
         });
         // apply the scroll location again
         // apparently chrome is too fast, it doesn't work without the millisecond delay
-        setTimeout(function() {window.scrollTo(0, scroll_pos);},1)    
+        setTimeout(function() {window.scrollTo(0, window.scrollPos);},1)    
     }
 }
 
