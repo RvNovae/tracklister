@@ -13,25 +13,20 @@ const process = require('process');
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
-const Settings = require('./modules/settings');
+var Settings = require('./modules/settings');
 const Data = require('./modules/data');
+const Helper = require('./modules/helper');
 
 BeatportLink.Start();
 Settings.Start();
 
+
 // saves the id/counter of the track that is currently being edited
 var is_editing, is_adding, is_add_above, is_add_below;
-var scroll_pos;
 
-
-// this little function ensures that keywords entered by the user can contain special characters
-// otherwise special characters might engage regex syntax
-RegExp.escape = function(string) {
-    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
 // Check for passed arguments (Open with tracklister.exe)
 remote.process.argv.forEach(function(argument) {
-    if (RegExp('.m3u8|.csv|.m3u|.nml').test(RegExp.escape(argument))) {
+    if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(argument))) {
         DOM.UI.Set();
         console.log(argument);
         convertFile(argument);
@@ -140,7 +135,7 @@ function delete_track(element, id) {
 }
 // sets track at id-1 to promo (be careful that counter is always +1, due to js counting from 0)
 function set_promo(element, id) {
-    Data.Tracks[id-1] = Settings.settings.promo;
+    Data.Tracks[id-1] = window.settings.promo;
     DOM.UI.Update();
 }
 // populates the edit modal form with values and opens it
@@ -220,15 +215,15 @@ function add_below(id) {
 function filter_ignore(track, counter) {
     try {
         // If this setting is disabled, return true / let the track pass
-        if (!Settings.settings.ignore.switch) {
+        if (!window.settings.ignore.switch) {
             return true;
         }
         // check if the keywords string contains any seperators (',')
-        if (RegExp(',').test(RegExp.escape(Settings.settings.ignore.keywords))) {
+        if (RegExp(',').test(Helper.RegExp.Escape(window.settings.ignore.keywords))) {
             // split the list of keywords by ',' and iterate through them
-            Settings.settings.ignore.keywords.split(',').forEach(function (keyword) {
+            window.settings.ignore.keywords.split(',').forEach(function (keyword) {
                 // check if keyword is found in track name
-                if ((new RegExp(RegExp.escape(keyword), 'gi')).test(track)) {
+                if ((new RegExp(Helper.RegExp.Escape(keyword), 'gi')).test(track)) {
                     // if a match is found => remove track from array and return false
                     Data.Tracks.splice(counter-1, 1);
                     return false;
@@ -238,7 +233,7 @@ function filter_ignore(track, counter) {
         // do this if no seperators (',') have been found in the keywords string
         else {
             // if keywords string is empty, let the track pass
-            if (Settings.settings.ignore.keywords == '') {
+            if (window.settings.ignore.keywords == '') {
                 return true;
             }
             // if the keywords string is not empty
@@ -246,7 +241,7 @@ function filter_ignore(track, counter) {
             // check against the keyword
             else {
                 // if a match is, remove the track from the array and let the track fail
-                if ((new RegExp(RegExp.escape(Settings.settings.ignore.keywords), 'gi')).test(track)) {
+                if ((new RegExp(Helper.RegExp.escape(window.settings.ignore.keywords), 'gi')).test(track)) {
                     Data.Tracks.splice(counter-1, 1);
                     return false;
                 }
@@ -266,30 +261,32 @@ function filter_ignore(track, counter) {
 function filter_syntax(track) {
     try {
         // if this setting is turned off => return the unmodified track
-        if (!Settings.settings.syntax.switch) {
+        if (!window.settings.syntax.switch) {
             return track;
         }
         // if the 'featuring' string is not empty =>
         // find and replace all instances with the set preference
         // try and catch are necessary in case it can't find any instances of these conventions
         // => save changes to the track variable
-        if (Settings.settings.syntax.featuring != '') {
+        if (window.settings.syntax.featuring != '') {
             try{
-                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + Settings.settings.syntax.featuring + ' ');
+                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + window.settings.syntax.featuring + ' ');
             }
-            catch {}
+            catch (error) {
+                console.log(error);
+            }
         }
         // same for the 'versus' string
-        if (Settings.settings.syntax.versus != '') {
+        if (window.settings.syntax.versus != '') {
             try {
-                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + Settings.settings.syntax.versus + ' ');
+                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + window.settings.syntax.versus + ' ');
             }
             catch {}
         }
         // same for the 'AND' string
-        if (Settings.settings.syntax.and != '') {
+        if (window.settings.syntax.and != '') {
             try {
-                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + Settings.settings.syntax.and + ' ');
+                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + window.settings.syntax.and + ' ');
             }
             catch {}
         }
@@ -305,7 +302,7 @@ function filter_syntax(track) {
 function filter_feature_fix(track) {
     // return unmodified track, if turned off
     try {
-        if (!Settings.settings.featured_fix.switch) {
+        if (!window.settings.featured_fix.switch) {
             return track;
         }
         // split track into artist and title column by looking for the ' - ' string
@@ -336,20 +333,20 @@ function filter_feature_fix(track) {
 function filter_omit(track) {
     try {
         // return unmodified track if setting is turned off
-        if (!Settings.settings.omit.switch) {
+        if (!window.settings.omit.switch) {
             return track;
         }
         else {
             // return unmodified track if the keyword list is empty
-            if (Settings.settings.omit.keywords == '') {
+            if (window.settings.omit.keywords == '') {
                 return track;
             }
             else {
                 try {
                     // split the keywords string at (',') and iterate through them
-                    Settings.settings.omit.keywords.split(',').forEach(function(keyword) {
+                    window.settings.omit.keywords.split(',').forEach(function(keyword) {
                         // if a match is found it will be replaced with an empty string
-                        track = track.replace(RegExp(RegExp.escape(keyword), 'gi'), '');
+                        track = track.replace(RegExp(Helper.RegExp.Escape(keyword), 'gi'), '');
                     });
                     // return the modified track 
                     return track;
@@ -357,7 +354,7 @@ function filter_omit(track) {
                 // if no seperator has been found, assume there is only one keyword
                 catch {
                     // if a match is found it will be replaced with an empty string
-                    track = track.replace(RegExp(RegExp.escape(Settings.settings.omit.keywords), 'gi'), '');
+                    track = track.replace(RegExp(Helper.RegExp.Escape(window.settings.omit.keywords), 'gi'), '');
                     return track;
                 }
             }
@@ -406,7 +403,7 @@ function move_down(element, id) {
 // this is not a track filter but rather a filter for the counter itself
 // hence it's strange placement
 function filter_tracknumber(counter) {
-    if (Settings.settings.tracknumber.switch) {
+    if (window.settings.tracknumber.switch) {
         var counter_digits;
         var highest_digits;
         var temp_counter = counter;
