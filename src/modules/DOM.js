@@ -84,28 +84,28 @@ Write = {
                 </div>
                 <div class="dropdown-menu" id="dropdown-`+counter+`" role="menu">
                     <div class="dropdown-content">
-                        <a href="#" onclick="delete_track(this, `+counter+`)" class="dropdown-item has-text-danger">
+                        <a href="#" onclick="Editor.Delete(this, `+counter+`)" class="dropdown-item has-text-danger">
                             <i class="fas fa-eraser"></i> Delete
                         </a>
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="set_promo(this, `+counter+`)" class="dropdown-item has-text-warning">
+                        <a href="#" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item has-text-warning">
                             <i class="fas fa-asterisk"></i> Set to Promo
                         </a>
-                        <a href="#" onclick="edit_track(this, `+counter+`)" class="dropdown-item">
+                        <a href="#" onclick="Editor.Edit.Start(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="move_up(this, `+counter+`)" class="dropdown-item">
+                        <a href="#" onclick="Editor.Move.Up(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-angle-up"></i> Move Up 
                         </a>
-                        <a href="#" onclick="move_down(this, `+counter+`)" class="dropdown-item">
+                        <a href="#" onclick="Editor.Move.Down(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-angle-down"></i> Move Down
                         </a>
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="add_above(` + (counter) + `)" class="dropdown-item">
+                        <a href="#" onclick="Editor.Add.Above(` + (counter) + `)" class="dropdown-item">
                             <i class="fas fa-angle-double-up"></i> Insert 1 above
                         </a>
-                        <a href="#" onclick="add_below(` + (counter) + `)" class="dropdown-item">
+                        <a href="#" onclick="Editor.Add.Below(` + (counter) + `)" class="dropdown-item">
                             <i class="fas fa-angle-double-down"></i> Insert 1 below
                         </a>
                     </div>

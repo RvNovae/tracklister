@@ -13,7 +13,7 @@
         <div id="head">
             <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
             <button class="button is-white is-small" id="erase_btn"><i class="fas fa-eraser"></i></button>
-            <button class="button is-white is-small" onclick="add_track('new')" id="add_btn"><i class="fas fa-plus"></i></button>
+            <button class="button is-white is-small" onclick="Editor.Add.Append('new')" id="add_btn"><i class="fas fa-plus"></i></button>
             <button class="button is-white is-small" onclick="DOM.Modal.Open('help_modal')" id="help_btn">Help</button>
             <button class="button is-white is-small" onclick="DOM.Modal.Open('settings_modal')" id="settings_btn">Settings</button>
             <button class="button is-white is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">About</button>
@@ -145,7 +145,7 @@
                 <button class="button is-small is-white is-pulled-right" onclick="DOM.Modal.Close('edit_modal')">Close</button>
                 <div class="modal-card-body">
                     <input class="input" id="edit_input" type="text" placeholder="Artist - Title">
-                    <a class="button submit is-link is-fullwidth" onclick="edit_save()" id="edit_submit">Save</a>
+                    <a class="button submit is-link is-fullwidth" onclick="Editor.Edit.Save()" id="edit_submit">Save</a>
                 </div> 
             </div>
         </div>
