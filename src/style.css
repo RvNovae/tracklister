@@ -17,3 +17,17 @@ html { height: 100%; overflow:auto; }
 #drop_modal {
     background-color: #E91E63;
 }
+
+.input {
+    font-family: monospace;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    background-color: #94d500;
+    font-weight: bold;
+    color: black;
+    padding: 10px;
+    width: 100%;
+}

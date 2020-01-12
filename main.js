@@ -10,8 +10,8 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
+      width: 650,
+      height: 850,
       title: "Tracklister " + app.getVersion(),
       webPreferences: {
         preload: path.join(__dirname, 'src/preload.js'),
@@ -23,7 +23,7 @@ function createWindow () {
   mainWindow.loadFile('src/index.html')
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   mainWindow.removeMenu();
 
