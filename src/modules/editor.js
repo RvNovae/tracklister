@@ -1,3 +1,5 @@
+const ARRAY_MOVE = require('array-move');
+
 module.exports = {
     Add: {
         Above: function(id) {
@@ -68,7 +70,7 @@ function moveUp(element, id) {
     // make sure the element isn't the first
     if (id-1 < 1) {}
     else {
-        Data.Tracks = arrayMove(Data.Tracks, id-1, id-2);
+        Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id-2);
         DOM.UI.Update();
     }
 }
@@ -78,7 +80,7 @@ function moveDown(element, id) {
     // make sure the element isn't the last
     if (id-1 > Data.Tracks.length-1) {}
     else {
-        Data.Tracks = arrayMove(Data.Tracks, id-1, id);
+        Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id);
         DOM.UI.Update();
     }
 }

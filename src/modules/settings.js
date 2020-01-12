@@ -1,3 +1,6 @@
+const FS = require('fs');
+const STORAGE = require('electron-json-storage');
+
 settings = {};
 
 module.exports = {
@@ -20,13 +23,13 @@ module.exports = {
 // load settings from settings file into the settings menu
 function load() {
     // check if settings file exists / create it if it doesn't exist
-    fs.access(storage.getDataPath('settings'), (err) => {
+    FS.access(STORAGE.getDataPath('settings'), (err) => {
         if (err) {
             reset();
             return;
         }
         // load settings
-        storage.get('settings', function(err, data) {
+        STORAGE.get('settings', function(err, data) {
             if (err) throw error;
             settings = data;
 
@@ -62,7 +65,7 @@ function reset() {
     settings.omit.keywords = '';
    
     // save settings to file
-    storage.set('settings', settings, function(err) {
+    STORAGE.set('settings', settings, function(err) {
         if (err) throw error;   
     });
     // load settings after they have been set
@@ -83,7 +86,7 @@ function save() {
     settings.omit.keywords = document.getElementById('settings_omit_input').value;
 
     // save settings to disk
-    storage.set('settings', settings, function(err) {
+    STORAGE.set('settings', settings, function(err) {
         if (err) throw error;
     });
     //close the settings modal

@@ -1,4 +1,8 @@
 const MM = require('music-metadata');
+const FS = require('fs');
+const READLINE = require('readline');
+const XML_JS = require('xml-js');
+const UTIL = require('util');
 
 module.exports = {
     Start: function(inputFile) {
@@ -46,8 +50,8 @@ function m3u8(inputFile) {
     var counter = 0;
     var track;
     // create a readline filestream, in order to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(inputFile),
+    const rl = READLINE.createInterface({
+        input: FS.createReadStream(inputFile),
         output: process.stdout,
         console: false
     });
@@ -91,8 +95,8 @@ function csv(inputFile) {
     var line_counter = 0;
     var track;
     // create filestream in order to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(inputFile),
+    const rl = READLINE.createInterface({
+        input: FS.createReadStream(inputFile),
         output: process.stdout,
         console: false
     });
@@ -136,9 +140,9 @@ function nml(input_file) {
     var json;
     var content;
     // because .nml is essentially xml, we can read the entire file as one
-    fs.readFile(input_file, 'utf8', function(err, contents) {
+    FS.readFile(input_file, 'utf8', function(err, contents) {
         // convert the xml to json 
-        json = xml_js.xml2json(contents, {compact: true, spaces: 4});
+        json = XML_JS.xml2json(contents, {compact: true, spaces: 4});
         // parse the json into a javascript object
         content = JSON.parse(json);
         // iterate through all 'Entry' elements 
@@ -171,8 +175,8 @@ function m3u(input_file) {
     var counter = 0;
     var track;
     // create filestream to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(input_file),
+    const rl = READLINE.createInterface({
+        input: FS.createReadStream(input_file),
         output: process.stdout,
         console: false
     });
@@ -209,10 +213,10 @@ function audio(input_file) {
     MM.parseFile(input_file, {native: false})
         .then(metadata => {
             var track = '';
-            var artist = util.inspect(metadata.common.artist, {showHidden : false, depth : null});
-            if (artist == '') { util.inspect(metadata.common.artists, {showHidden : false, depth : null}); }
+            var artist = UTIL.inspect(metadata.common.artist, {showHidden : false, depth : null});
+            if (artist == '') { UTIL.inspect(metadata.common.artists, {showHidden : false, depth : null}); }
 
-            var title = util.inspect(metadata.common.title, {showHidden : false, depth : null});
+            var title = UTIL.inspect(metadata.common.title, {showHidden : false, depth : null});
 
             artist = artist.substr(1, artist.length -2);
             title = title.substr(1, title.length -2);

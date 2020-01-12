@@ -1,13 +1,4 @@
-const fs = require('fs');
-const readline = require('readline');
-const { app, shell } = require('electron');
-const xml_js = require('xml-js');
-const arrayMove = require('array-move');
-const storage = require('electron-json-storage');
 const remote = require('electron').remote;
-const util = require('util');
-const path = require('path');
-const process = require('process');
 
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');

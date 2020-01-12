@@ -1,6 +1,7 @@
 const PATH = require('path');
 const FIRSTLINE = require('firstline');
 const FS = require('fs');
+const PROCESS = require('process');
 
 var lastID = 0;
 var rekordboxPath = getRekordboxPath();
@@ -126,9 +127,9 @@ function extractJSON(input) {
 function getRekordboxPath() {
     let temp;
 
-    temp = process.env.APPDATA + path.sep + "Pioneer" + path.sep + "rekordbox" + path.sep + "beatport" + path.sep
+    temp = PROCESS.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
     temp += FS.readdirSync(temp)[0];
-    temp += path.sep + "tr";
+    temp += PATH.sep + "tr";
 
     return temp;
 }
