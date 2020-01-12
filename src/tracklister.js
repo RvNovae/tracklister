@@ -16,6 +16,7 @@ const Settings = require('./modules/settings');
 const Data = require('./modules/data');
 const Helper = require('./modules/helper');
 const Converter = require('./modules/converter');
+const State = require('./modules/state');
 require('./modules/key');
 
 BeatportLink.Start();
@@ -44,7 +45,7 @@ function set_promo(element, id) {
 // this just makes saving the data easier
 function edit_track(element, id) {
     document.getElementById('edit_input').value = Data.Tracks[id-1];
-    is_editing = id;
+    State.Editing.Set(id);
     DOM.Modal.Open('edit_modal');
     document.getElementById('edit_input').focus();
 }
@@ -53,21 +54,19 @@ function edit_track(element, id) {
 function edit_save() {
     if (document.getElementById('edit_input').value == "") {
         DOM.Modal.Close('edit_modal');
-        is_adding = false;
-        is_add_above = false;
-        is_add_below = false; 
+        State.Reset();
         return;
     }
     // check whether we're editing or adding
-    if (is_adding) {
+    if (State.Adding.Get()) {
         // the temporary array is necessary, otherwise the array can't be read/written properly
         var temp_tracks = [];
         var desired_location;
         // determine the array index where the track should be stored
-        if (is_add_above) {desired_location = is_editing-1}
-        if (is_add_below) {desired_location = is_editing}
+        if (State.Adding.Above.Get()) {desired_location = State.Editing.Get()-1}
+        if (State.Adding.Below.Get()) {desired_location = State.Editing.Get()}
         // if neither add above or add below is specified, it will simply be appended
-        if(!is_add_above && !is_add_below) {desired_location = Data.Tracks.length}
+        if(!State.Adding.Above.Get() && !State.Adding.Below.Get()) {desired_location = Data.Tracks.length}
         // iterate through the tracks array
         // shift all entries after the desired location down by one
         for (let i = 0; i < Data.Tracks.length; i++) {
@@ -84,13 +83,11 @@ function edit_save() {
     }
     // apply the edited value to the original value in the array
     else {
-        Data.Tracks[is_editing-1] = document.getElementById('edit_input').value;
+        Data.Tracks[State.Editing.Get()-1] = document.getElementById('edit_input').value;
     }
     // close the modal and reset all the flags
     DOM.Modal.Close('edit_modal');
-    is_adding = false;
-    is_add_above = false;
-    is_add_below = false;
+    State.Reset();
     // refresh the UI
     DOM.UI.Update();
 }
@@ -98,24 +95,23 @@ function edit_save() {
 // because we are reusing the edit modal, saving can be done via the edit_save function
 // if no arguments are passed: simply append the new track to the end of the tracklist
 function add_track(id) {
-    is_adding = true;
+    State.Adding.Set(true);
     document.getElementById('edit_input').value = "";
     if (id == 'new') {
-        is_editing = Data.Tracks.length+1;
+        State.Editing.Set(Data.Tracks.length+1);
     }
     else {
-        is_editing = id;
-        console.log('is_editing:' + id);
+        State.Editing.Set(id);
     }
     DOM.Modal.Open('edit_modal');
     document.getElementById('edit_input').focus();
 }
 function add_above(id) {
-    is_add_above = true;
+    State.Adding.Above.Set(true);
     add_track(id);
 }
 function add_below(id) {
-    is_add_below = true;
+    State.Adding.Below.Set(true);
     add_track(id);
 }
 // this filter returns true if the track passes the ignore list
