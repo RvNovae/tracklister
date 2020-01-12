@@ -1,6 +1,8 @@
 const { clipboard } = require('electron');
 
 const Data = require('./data');
+const Converter = require('./converter');
+
 window.scrollPos = 0;
 
 Modal = {
@@ -137,8 +139,8 @@ Dropdown = {
 module.exports = {
     Modal: Modal,
     UI: UI,
-    Write: Write,
-    Dropdown: Dropdown
+    Dropdown: Dropdown,
+    Write: Write
 }
 
 // add event listener for modal backgrounds => close the modal on click 
@@ -147,6 +149,20 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
         //element.parentNode.classList.remove('is-active');
         Modal.Close(element.parentNode.id);
     });
+});
+
+// listen for file drop
+document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // clear / prepare the UI
+    DOM.UI.Set();
+    // get file object from drop
+    for (const f of e.dataTransfer.files) {
+        // start the conversion process
+        // convertFile(f.path);
+        Converter.Start(f.path);
+    }
 });
 
 // add event listener for the copy button
