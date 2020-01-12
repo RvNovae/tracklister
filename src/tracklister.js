@@ -22,6 +22,3 @@ REMOTE.process.argv.forEach(function(argument) {
         Converter.Start(argument);
     }
 });
-
-
-
