@@ -1,4 +1,5 @@
 const ARRAY_MOVE = require('array-move');
+const State = require('./state');
 
 module.exports = {
     Add: {
