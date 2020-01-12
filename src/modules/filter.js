@@ -172,7 +172,6 @@ function omit(track) {
 }
 
 // this is not a track filter but rather a filter for the counter itself
-// hence it's strange placement
 // function filter_tracknumber(counter) {
 //     if (Settings.Get().tracknumber.switch) {
 //         var counter_digits;
