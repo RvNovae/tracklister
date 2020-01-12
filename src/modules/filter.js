@@ -108,7 +108,7 @@ function syntax(track) {
 function featureFix(track) {
     // return unmodified track, if turned off
     try {
-        if (!Settings.Get().featured_fix.switch) {
+        if (!Settings.Get().featured_fix.switch || !track.includes(' - ')) {
             return track;
         }
         // split track into artist and title column by looking for the ' - ' string
