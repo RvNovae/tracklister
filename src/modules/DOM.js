@@ -73,7 +73,7 @@ Write = {
         document.getElementById('tracklist').innerHTML += `
             <div class="dropdown">
                 <div class="dropdown-trigger">
-                    <button onclick="toggle_dropdown(this, `+counter+`)" class="button is-small is-white dropdown-trigger-btn" aria-haspopup="true" id="dropdown-`+counter+`">
+                    <button onclick="Dropdown.Toggle(this, `+counter+`)" class="button is-small is-white dropdown-trigger-btn" aria-haspopup="true" id="dropdown-`+counter+`">
                         <span class="icon is-small">
                             <i class="fas fa-angle-down" aria-hidden="true"></i>
                         </span>
@@ -115,10 +115,30 @@ Write = {
     }
 }
 
+Dropdown = {
+    Toggle: function(element, id) {
+        // make dropdowns work
+        // make sure all dropdowns are closed before a new one is opened
+        Array.from(document.getElementsByClassName('dropdown')).forEach(function(elem) {
+            if (element.parentNode.parentNode != elem) {
+                elem.classList.remove('is-active');    
+            }
+        });
+        // make dropdown visible
+        element.parentNode.parentNode.classList.toggle('is-active');
+        // toggle the icons to make the dropdown more responsive
+        // toggle down arrow
+        element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-down');
+        // toggle up arrow
+        element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-up');
+    }
+}
+
 module.exports = {
     Modal: Modal,
     UI: UI,
-    Write: Write
+    Write: Write,
+    Dropdown: Dropdown
 }
 
 // add event listener for modal backgrounds => close the modal on click 

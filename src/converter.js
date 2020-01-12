@@ -82,23 +82,6 @@ function convertFile(input_file) {
             break;
     }
 }
-// make dropdowns work
-function toggle_dropdown(element, id) {
-    // make sure all dropdowns are closed before a new one is opened
-    Array.from(document.getElementsByClassName('dropdown')).forEach(function(elem) {
-        if (element.parentNode.parentNode != elem) {
-            elem.classList.remove('is-active');    
-        }
-    });
-    // make dropdown visible
-    element.parentNode.parentNode.classList.toggle('is-active');
-    // toggle the icons to make the dropdown more responsive
-    // toggle down arrow
-    element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-down');
-    // toggle up arrow
-    element.getElementsByClassName('fas')[0].classList.toggle('fa-angle-up');
-}
-
 
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
