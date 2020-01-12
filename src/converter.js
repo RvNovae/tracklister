@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const { clipboard, app, shell } = require('electron');
+const { app, shell } = require('electron');
 const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
@@ -16,6 +16,7 @@ const DOM = require('./modules/DOM');
 var Settings = require('./modules/settings');
 const Data = require('./modules/data');
 const Helper = require('./modules/helper');
+const Key = require('./modules/key');
 
 BeatportLink.Start();
 Settings.Start();
@@ -28,7 +29,6 @@ var is_editing, is_adding, is_add_above, is_add_below;
 remote.process.argv.forEach(function(argument) {
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(argument))) {
         DOM.UI.Set();
-        console.log(argument);
         convertFile(argument);
     }
 });
@@ -45,34 +45,6 @@ document.addEventListener('drop', (e) => {
         convertFile(f.path);
     }
 });
-// handle key inputs
-document.addEventListener('keyup', function(e) {
-    if (e.key === "Escape") {
-        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
-            DOM.Modal.Close(elem.id);
-        });
-    }
-    if (e.key === "Enter") {
-        Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
-            if (elem.classList.contains('is-active')) {
-                elem.getElementsByClassName('submit')[0].click();
-            }
-        });
-    }
-});
-
-// add event listener for the copy button
-document.getElementById('copy_btn').addEventListener('click', function() {
-    // copy text from pure text element to the clipboard
-    clipboard.writeText(document.getElementById('pure_text').innerText);
-    // change the copy button apperance => opaque icon ("has been copied!")
-    this.innerHTML = '<i class="fas fa-copy"></i>';
-});
-document.getElementById('erase_btn').addEventListener('click', function() {
-    Data.Tracks.length = 0;
-    DOM.UI.Reset();
-});
-
 
 // determine file type and call file specific function
 function convertFile(input_file) {
@@ -150,6 +122,13 @@ function edit_track(element, id) {
 // save the the edited / added data at the desired location, close the edit modal and reload the UI
 // because we re-use the edit modal for adding, they also share the same save function
 function edit_save() {
+    if (document.getElementById('edit_input').value == "") {
+        DOM.Modal.Close('edit_modal');
+        is_adding = false;
+        is_add_above = false;
+        is_add_below = false; 
+        return;
+    }
     // check whether we're editing or adding
     if (is_adding) {
         // the temporary array is necessary, otherwise the array can't be read/written properly
