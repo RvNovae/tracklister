@@ -135,7 +135,7 @@ function delete_track(element, id) {
 }
 // sets track at id-1 to promo (be careful that counter is always +1, due to js counting from 0)
 function set_promo(element, id) {
-    Data.Tracks[id-1] = window.settings.promo;
+    Data.Tracks[id-1] = Settings.Get().promo;
     DOM.UI.Update();
 }
 // populates the edit modal form with values and opens it
@@ -215,13 +215,13 @@ function add_below(id) {
 function filter_ignore(track, counter) {
     try {
         // If this setting is disabled, return true / let the track pass
-        if (!window.settings.ignore.switch) {
+        if (!Settings.Get().ignore.switch) {
             return true;
         }
         // check if the keywords string contains any seperators (',')
-        if (RegExp(',').test(Helper.RegExp.Escape(window.settings.ignore.keywords))) {
+        if (RegExp(',').test(Helper.RegExp.Escape(Settings.Get().ignore.keywords))) {
             // split the list of keywords by ',' and iterate through them
-            window.settings.ignore.keywords.split(',').forEach(function (keyword) {
+            Settings.Get().ignore.keywords.split(',').forEach(function (keyword) {
                 // check if keyword is found in track name
                 if ((new RegExp(Helper.RegExp.Escape(keyword), 'gi')).test(track)) {
                     // if a match is found => remove track from array and return false
@@ -233,7 +233,7 @@ function filter_ignore(track, counter) {
         // do this if no seperators (',') have been found in the keywords string
         else {
             // if keywords string is empty, let the track pass
-            if (window.settings.ignore.keywords == '') {
+            if (Settings.Get().ignore.keywords == '') {
                 return true;
             }
             // if the keywords string is not empty
@@ -241,7 +241,7 @@ function filter_ignore(track, counter) {
             // check against the keyword
             else {
                 // if a match is, remove the track from the array and let the track fail
-                if ((new RegExp(Helper.RegExp.escape(window.settings.ignore.keywords), 'gi')).test(track)) {
+                if ((new RegExp(Helper.RegExp.escape(Settings.Get().ignore.keywords), 'gi')).test(track)) {
                     Data.Tracks.splice(counter-1, 1);
                     return false;
                 }
@@ -261,32 +261,32 @@ function filter_ignore(track, counter) {
 function filter_syntax(track) {
     try {
         // if this setting is turned off => return the unmodified track
-        if (!window.settings.syntax.switch) {
+        if (!Settings.Get().syntax.switch) {
             return track;
         }
         // if the 'featuring' string is not empty =>
         // find and replace all instances with the set preference
         // try and catch are necessary in case it can't find any instances of these conventions
         // => save changes to the track variable
-        if (window.settings.syntax.featuring != '') {
+        if (Settings.Get().syntax.featuring != '') {
             try{
-                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + window.settings.syntax.featuring + ' ');
+                track = track.replace(new RegExp('( featuring | ft | ft\. | feat | feat\. )', 'gi'), ' ' + Settings.Get().syntax.featuring + ' ');
             }
             catch (error) {
                 console.log(error);
             }
         }
         // same for the 'versus' string
-        if (window.settings.syntax.versus != '') {
+        if (Settings.Get().syntax.versus != '') {
             try {
-                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + window.settings.syntax.versus + ' ');
+                track = track.replace(new RegExp('( versus | vs | vs\. )', 'gi'), ' ' + Settings.Get().syntax.versus + ' ');
             }
             catch {}
         }
         // same for the 'AND' string
-        if (window.settings.syntax.and != '') {
+        if (Settings.Get().syntax.and != '') {
             try {
-                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + window.settings.syntax.and + ' ');
+                track = track.replace(new RegExp('( and | & | \\+ )', 'i'), ' ' + Settings.Get().syntax.and + ' ');
             }
             catch {}
         }
@@ -302,7 +302,7 @@ function filter_syntax(track) {
 function filter_feature_fix(track) {
     // return unmodified track, if turned off
     try {
-        if (!window.settings.featured_fix.switch) {
+        if (!Settings.Get().featured_fix.switch) {
             return track;
         }
         // split track into artist and title column by looking for the ' - ' string
@@ -333,18 +333,18 @@ function filter_feature_fix(track) {
 function filter_omit(track) {
     try {
         // return unmodified track if setting is turned off
-        if (!window.settings.omit.switch) {
+        if (!Settings.Get().omit.switch) {
             return track;
         }
         else {
             // return unmodified track if the keyword list is empty
-            if (window.settings.omit.keywords == '') {
+            if (Settings.Get().omit.keywords == '') {
                 return track;
             }
             else {
                 try {
                     // split the keywords string at (',') and iterate through them
-                    window.settings.omit.keywords.split(',').forEach(function(keyword) {
+                    Settings.Get().omit.keywords.split(',').forEach(function(keyword) {
                         // if a match is found it will be replaced with an empty string
                         track = track.replace(RegExp(Helper.RegExp.Escape(keyword), 'gi'), '');
                     });
@@ -354,7 +354,7 @@ function filter_omit(track) {
                 // if no seperator has been found, assume there is only one keyword
                 catch {
                     // if a match is found it will be replaced with an empty string
-                    track = track.replace(RegExp(Helper.RegExp.Escape(window.settings.omit.keywords), 'gi'), '');
+                    track = track.replace(RegExp(Helper.RegExp.Escape(Settings.Get().omit.keywords), 'gi'), '');
                     return track;
                 }
             }
@@ -403,7 +403,7 @@ function move_down(element, id) {
 // this is not a track filter but rather a filter for the counter itself
 // hence it's strange placement
 function filter_tracknumber(counter) {
-    if (window.settings.tracknumber.switch) {
+    if (Settings.Get().tracknumber.switch) {
         var counter_digits;
         var highest_digits;
         var temp_counter = counter;
