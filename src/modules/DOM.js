@@ -2,6 +2,7 @@ const { clipboard } = require('electron');
 
 const Data = require('./data');
 const Converter = require('./converter');
+const Filter = require('./filter');
 
 window.scrollPos = 0;
 
@@ -60,7 +61,7 @@ UI = {
 Write = {
     Track: function(track, counter) {
         // run the through all the filters
-        track = filter(track, counter);
+        track = Filter.Process(track, counter);
         // if it doesn't pass, return 0
         if (!track) {
             return 0;
