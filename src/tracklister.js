@@ -5,7 +5,6 @@ const xml_js = require('xml-js');
 const arrayMove = require('array-move');
 const storage = require('electron-json-storage');
 const remote = require('electron').remote;
-const mm = require('music-metadata');
 const util = require('util');
 const path = require('path');
 const process = require('process');
@@ -13,75 +12,22 @@ const process = require('process');
 // The Apps's "Classes" aka Modules
 const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
-var Settings = require('./modules/settings');
+const Settings = require('./modules/settings');
 const Data = require('./modules/data');
 const Helper = require('./modules/helper');
-const Key = require('./modules/key');
+const Converter = require('./modules/converter');
+require('./modules/key');
 
 BeatportLink.Start();
 Settings.Start();
-
-
-// saves the id/counter of the track that is currently being edited
-var is_editing, is_adding, is_add_above, is_add_below;
 
 // Check for passed arguments (Open with tracklister.exe)
 remote.process.argv.forEach(function(argument) {
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(argument))) {
         DOM.UI.Set();
-        convertFile(argument);
+        Converter.Start(argument);
     }
 });
-// listen for file drop
-document.addEventListener('drop', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // clear / prepare the UI
-    console.log(e);
-    DOM.UI.Set();
-    // get file object from drop
-    for (const f of e.dataTransfer.files) {
-        // start the conversion process
-        convertFile(f.path);
-    }
-});
-
-// determine file type and call file specific function
-function convertFile(input_file) {
-    // extract extension from file name
-    var extension = input_file.split('.').pop();
-    extension = extension.toLowerCase();
-    // call conversion function based on extension
-    switch (extension) {
-        case 'm3u8':
-            m3u8(input_file);
-            break;
-        case 'nml':
-            nml(input_file);
-            break;
-        case 'csv':
-            csv(input_file);
-            break;
-        case 'm3u':
-            m3u(input_file);
-            break;
-        // audio files
-        case 'wav':
-        case 'mp3':
-        case 'flac':
-        case 'aiff':
-        case 'aif':
-        case 'aac':
-        case 'ogg':
-        case 'wma':  
-            audio(input_file);
-            break;
-        default:
-            alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
-            DOM.UI.Reset();
-            break;
-    }
-}
 
 // deletes a the desired track, reindexes the array and reloads the UI
 function delete_track(element, id) {
@@ -393,196 +339,4 @@ function filter_tracknumber(counter) {
     }
 
     return counter
-}
-
-
-// this function handles .m3u8 files
-// these .m3u8 files must have been exported by Rekordbox 
-// interpretations differ from program to program
-function m3u8(input_file) {
-    // declare counter and track
-    var counter = 0;
-    var track;
-    // create a readline filestream, in order to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(input_file),
-        output: process.stdout,
-        console: false
-    });
-    // iterate through every line
-    rl.on('line', function(line) {
-        // example of a line containing useful data:
-        // #EXTINF:269,LU-I - Swallow tail
-        // everything interesting is stored after a comma
-        // if there is no comma, there is nothing interesting in that line
-        if (RegExp("#EXTINF:").test(line)) {
-            // if found
-            // increase the counter
-            counter += 1;
-            // attempt to split the track at the first comma
-            // extract everything after the comma
-            try {
-                var temp = line.split(',', 1).shift() + ',';
-                track = line.replace(temp, '');
-            }
-            // display an error for the file that could not be gathered properly
-            // assume that the file has been not been tagged properly
-            catch {
-                track = "###Error, is this file tagged properly?";
-            }
-            // append the extracted to the tracks array
-            Data.Tracks.push(track);
-            // write the track
-            var ignored = DOM.Write.Track(track, counter);
-            // if it does not pass, the counter has to be decreased to account for the missing track
-            if (ignored == 0) {counter--}
-        }
-    })
-}
-// this function handles .csv files
-// these .csv files must have been exported by Serato 
-// interpretations differ from program to program
-function csv(input_file) {
-    // declare counter, line_counter and track
-    var counter = 0;
-    var line_counter = 0;
-    var track;
-    // create filestream in order to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(input_file),
-        output: process.stdout,
-        console: false
-    });
-    // iterate through every line
-    rl.on('line', function(line) {
-        // the first three lines in Serato's .csv files are essentially useless
-        // this makes sure they are skipped
-        line_counter += 1; 
-        if (line_counter > 2) {
-            // increase the track counter
-            counter += 1;
-            // example of a line
-            // "Audiofreq - Dance 2 Music (Extended Mix)","16:56:00","17:01:45","00:05:45","1",""
-            // everything before the first '",' contains the trackname
-            // extract that and replace the '"' at the beginning
-            try {
-                track = line.split('",', 1).shift().replace('"', '');
-            }
-            // if the track is not tagged properly this may cause issues 
-            // set the track to an error string
-            catch {
-                track = "###Error, is this file tagged properly?";
-            }
-            // append the track to the tracks array
-            Data.Tracks.push(track);
-            // write the track
-            var ignored = DOM.Write.Track(track, counter);
-            // if it does not pass, the counter has to be decreased to account for the missing track
-            if (ignored == 0) {counter--}
-        }
-    })
-}
-// this function handles .nml files
-// these .nml files must have been exported by Traktor 
-// interpretations differ from program to program
-function nml(input_file) {
-    // declare some variables
-    var counter = 0;
-    var track;
-    var json;
-    var content;
-    // because .nml is essentially xml, we can read the entire file as one
-    fs.readFile(input_file, 'utf8', function(err, contents) {
-        // convert the xml to json 
-        json = xml_js.xml2json(contents, {compact: true, spaces: 4});
-        // parse the json into a javascript object
-        content = JSON.parse(json);
-        // iterate through all 'Entry' elements 
-        content.NML.COLLECTION.ENTRY.forEach(element => {
-            // increase counter
-            counter += 1;
-            // extract data from the artist and title column
-            // save to the track variable
-            try {
-                track = element._attributes.ARTIST + " - " + element._attributes.TITLE
-            }
-            // if the track is not tagged properly, this may cause issues
-            // set track to an error message
-            catch {
-                track = "###Error, is this file tagged properly?";
-            }
-            // write track
-            var ignored = DOM.Write.Track(track, counter);
-            // if it does not pass, the counter has to be decreased to account for the missing track
-            if (ignored == 0) {counter--}
-        });
-    }); 
-}
-// this function handles .m3u files
-// these .m3u files must have been exported by VirtualDJ (Traktor's .m3u will not work!)
-// interpretations differ from program to program
-function m3u(input_file) {
-    // declare variables
-    var counter = 0;
-    var track;
-    // create filestream to read the file line by line
-    const rl = readline.createInterface({
-        input: fs.createReadStream(input_file),
-        output: process.stdout,
-        console: false
-    });
-    // iterate through every line
-    rl.on('line', function(line) {
-        // lines containing interesting data in VDJ's .m3u files look like this:
-        // #EXTVDJ:<time>18:51</time><lastplaytime>1562431872</lastplaytime><filesize>14509227</filesize><artist>SPIT</artist><title>Check This</title>
-        // Because they all start with #EXTVDJ, we only check lines containing that phrase
-        if (RegExp("#EXTVDJ").test(line)) {
-            // increase counter
-            counter += 1;
-            // extract everything that is contained between <artist> and </artist> and <title> and </title>
-            // merge them together into the track name
-            try {
-                track = line.match(new RegExp('<artist>(.*)</artist>')).pop() + 
-                ' - ' + line.match('<title>(.*)</title>').pop(); 
-            }
-            // If the track is not tagged properly, those tags can't be found in the line
-            // ==> set track to error message
-            catch {
-                track = "###Error, is this file tagged properly?";
-            }
-            // write track
-            var ignored = DOM.Write.Track(track, counter);
-            // if it does not pass, the counter has to be decreased to account for the missing track
-            if (ignored == 0) {counter--}
-        }
-    });
-}
-
-// when an audio file is dropped -> get metadata / filename
-function audio(input_file) {
-
-    mm.parseFile(input_file, {native: false})
-        .then(metadata => {
-            var track = '';
-            var artist = util.inspect(metadata.common.artist, {showHidden : false, depth : null});
-            if (artist == '') { util.inspect(metadata.common.artists, {showHidden : false, depth : null}); }
-
-            var title = util.inspect(metadata.common.title, {showHidden : false, depth : null});
-
-            artist = artist.substr(1, artist.length -2);
-            title = title.substr(1, title.length -2);
-
-            if (artist && title && artist != 'ndefine' && title != 'ndefine') {
-                track = artist + ' - ' + title;
-            }   
-            else {
-                track = input_file.replace(/^.*[\\\/]/, '').split('.').slice(0, -1).join('.');
-            }
-            Data.Tracks.push(track);
-            DOM.UI.Update();
-            console.log(Data.Tracks);
-        })
-        .catch ( err => {
-            console.error(err.message);
-        })
 }
