@@ -1,3 +1,5 @@
+const { clipboard } = require('electron');
+
 const Data = require('./data');
 window.scrollPos = 0;
 
@@ -125,6 +127,18 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
         //element.parentNode.classList.remove('is-active');
         Modal.Close(element.parentNode.id);
     });
+});
+
+// add event listener for the copy button
+document.getElementById('copy_btn').addEventListener('click', function() {
+    // copy text from pure text element to the clipboard
+    clipboard.writeText(document.getElementById('pure_text').innerText);
+    // change the copy button apperance => opaque icon ("has been copied!")
+    this.innerHTML = '<i class="fas fa-copy"></i>';
+});
+document.getElementById('erase_btn').addEventListener('click', function() {
+    Data.Tracks.length = 0;
+    DOM.UI.Reset();
 });
 
 // NOT IMPLEMENTED YET
