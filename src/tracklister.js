@@ -1,7 +1,6 @@
 const REMOTE = require('electron').remote;
 
 // The Apps's "Classes" aka Modules
-const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
 const Settings = require('./modules/settings');
 const Data = require('./modules/data'); // globally accessed in almost every module, therefore it gets required here
@@ -15,6 +14,7 @@ require('./modules/key'); // key functions never have to be called explicitly, t
 Settings.Start();
 if (REMOTE.process.platform == 'win-32') { // Currently beatport-link functionality only works on Windows
     try {
+        const BeatportLink = require('./modules/beatport-link');
         BeatportLink.Start();
     }
     catch (err) {
