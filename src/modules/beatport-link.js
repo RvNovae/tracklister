@@ -130,6 +130,6 @@ function getRekordboxPath() {
     temp = PROCESS.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
     temp += FS.readdirSync(temp)[0];
     temp += PATH.sep + "tr";
-
+    
     return temp;
 }

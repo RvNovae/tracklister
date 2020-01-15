@@ -156,8 +156,11 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
 document.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // clear / prepare the UI
-    DOM.UI.Set();
+    // clear / prepare the UI if playlist file
+    if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(e.dataTransfer.files[0].path))) {
+        DOM.UI.Set();
+    }
+    
     // get file object from drop
     for (const f of e.dataTransfer.files) {
         // start the conversion process

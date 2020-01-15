@@ -1,7 +1,6 @@
 const REMOTE = require('electron').remote;
 
 // The Apps's "Classes" aka Modules
-const BeatportLink = require('./modules/beatport-link');
 const DOM = require('./modules/DOM');
 const Settings = require('./modules/settings');
 const Data = require('./modules/data'); // globally accessed in almost every module, therefore it gets required here
@@ -12,8 +11,16 @@ const Editor = require('./modules/editor'); // NOT UNUSED, the HTML needs the co
 require('./modules/key'); // key functions never have to be called explicitly, therefore it doesn't need a constant 
 
 // some of tracklister's functions need to be invoked at program start.
-BeatportLink.Start();
 Settings.Start();
+if (REMOTE.process.platform == 'win-32') { // Currently beatport-link functionality only works on Windows
+    try {
+        const BeatportLink = require('./modules/beatport-link');
+        BeatportLink.Start();
+    }
+    catch (err) {
+        console.log("BeatportLink integration could not be initialised: " + err);
+    }
+}
 
 // Check for passed arguments (Open with tracklister.exe)
 REMOTE.process.argv.forEach(function(argument) {
