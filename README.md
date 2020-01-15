@@ -41,4 +41,4 @@ If you would like to package the program for yourself, you can use [Electron Bui
 `npm add -g electron-builder`
 
 2. Package the program!
-`electron-builder .` or `npm dist`
+`electron-builder .` or `npm run dist`
