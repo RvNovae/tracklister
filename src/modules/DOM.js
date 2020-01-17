@@ -163,17 +163,6 @@ function YesNo() {
     });
 }
 
-function YesNo() {
-    return new Promise((resolve, reject) => {
-        Modal.Open('yesno_modal');
-        Array.from(document.getElementsByClassName('yesno_button')).forEach( (element) => {
-            element.addEventListener('click', (e) => {
-                resolve(e.srcElement.dataset.value);
-            });
-        });
-    });
-}
-
 // listen for file drop
 document.addEventListener('drop', (e) => {
     files = e.dataTransfer.files;
