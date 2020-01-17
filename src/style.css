@@ -22,6 +22,16 @@ html { height: 100%; overflow:auto; }
     font-family: monospace;
 }
 
+#edit_submit {
+    border-top-left-radius: 0%;
+    border-top-right-radius: 0%;
+}
+
+#edit_input {
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+}
+
 .footer {
     position: absolute;
     bottom: 0;
