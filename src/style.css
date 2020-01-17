@@ -10,6 +10,7 @@ html { height: 100%; overflow:auto; }
 
 #tracklist {
     margin: 10px;
+    margin-bottom: 50px;
 }
 #pure_text {
     display: none;
@@ -37,11 +38,11 @@ html { height: 100%; overflow:auto; }
 }
 
 .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     background-color: #94d500;
     font-weight: bold;
     color: black;
-    padding: 10px;
+    padding: 2px;
     width: 100%;
 }

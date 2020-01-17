@@ -5,6 +5,7 @@ const Converter = require('./converter');
 const Filter = require('./filter');
 
 window.scrollPos = 0;
+document.getElementById('bpl_footer').style.visibility = "hidden";
 
 Modal = {
     Close: function(id){
