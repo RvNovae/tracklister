@@ -35,7 +35,7 @@ module.exports = {
                 audio(inputFile);
                 break;
             default:
-                alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
+                alert('Unsupported file type! .m3u8, .nml, .csv, .m3u and audio files are supported.');
                 break;
         }
     }
