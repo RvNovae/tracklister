@@ -46,7 +46,7 @@ module.exports = {
 // interpretations differ from program to program
 function m3u8(inputFile) {
     // declare counter and track
-    var counter = 0;
+    var counter = Data.Tracks.length;
     var track;
     // create a readline filestream, in order to read the file line by line
     const rl = READLINE.createInterface({
@@ -90,7 +90,7 @@ function m3u8(inputFile) {
 // interpretations differ from program to program
 function csv(inputFile) {
     // declare counter, line_counter and track
-    var counter = 0;
+    var counter = Data.Tracks.length;
     var line_counter = 0;
     var track;
     // create filestream in order to read the file line by line
@@ -134,7 +134,7 @@ function csv(inputFile) {
 // interpretations differ from program to program
 function nml(input_file) {
     // declare some variables
-    var counter = 0;
+    var counter = Data.Tracks.length;
     var track;
     var json;
     var content;
@@ -171,7 +171,7 @@ function nml(input_file) {
 // interpretations differ from program to program
 function m3u(input_file) {
     // declare variables
-    var counter = 0;
+    var counter = Data.Tracks.length;
     var track;
     // create filestream to read the file line by line
     const rl = READLINE.createInterface({
