@@ -212,8 +212,14 @@ document.getElementById('copy_btn').addEventListener('click', function() {
     this.innerHTML = '<i class="fas fa-copy"></i>';
 });
 document.getElementById('erase_btn').addEventListener('click', function() {
-    Data.Tracks.length = 0;
-    DOM.UI.Reset();
+    if (Data.Tracks.length < 1) {return;}
+    YesNo().then((val) => {
+        if (val == 'yes') {
+            Data.Tracks.length = 0;
+            DOM.UI.Reset();
+        }
+    });
+    
 });
 
 // NOT IMPLEMENTED YET
