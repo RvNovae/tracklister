@@ -152,7 +152,7 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
     });
 });
 
-function YesNoPromise() {
+function YesNo() {
     return new Promise((resolve, reject) => {
         Modal.Open('yesno_modal');
         Array.from(document.getElementsByClassName('yesno_button')).forEach( (element) => {
@@ -163,23 +163,35 @@ function YesNoPromise() {
     });
 }
 
-function YesNo(files) {
-    YesNoPromise().then( (value) => {
-        if (value == 'yes') {
-            DOM.UI.Set();
-        }
-        if (value == 'cancel') {
-            return;
-        }
-        console.log(files);
-        for (const f of files) {
-            Converter.Start(f.path);
-        }
+// function YesNo(files) {
+//     YesNoPromise().then( (value) => {
+//         if (value == 'yes') {
+//             DOM.UI.Set();
+//         }
+//         if (value == 'cancel') {
+//             return;
+//         }
+//         console.log(files);
+//         for (const f of files) {
+//             Converter.Start(f.path);
+//         }
+//     });
+// }
+
+function YesNo() {
+    return new Promise((resolve, reject) => {
+        Modal.Open('yesno_modal');
+        Array.from(document.getElementsByClassName('yesno_button')).forEach( (element) => {
+            element.addEventListener('click', (e) => {
+                resolve(e.srcElement.dataset.value);
+            });
+        });
     });
 }
 
 // listen for file drop
 document.addEventListener('drop', (e) => {
+    files = e.dataTransfer.files;
     e.preventDefault();
     e.stopPropagation();
     // clear / prepare the UI if playlist file
@@ -192,7 +204,16 @@ document.addEventListener('drop', (e) => {
             return;
         }
 
-        YesNo(e.dataTransfer.files);
+        YesNo().then( (val) => {
+            if (val == 'yes') 
+                DOM.UI.Set();
+            if (val == 'cancel') 
+                return;
+
+            for (const f of files) {
+                Converter.Start(f.path);
+            }
+        });
 
         return;
     }
