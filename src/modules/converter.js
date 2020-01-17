@@ -36,7 +36,6 @@ module.exports = {
                 break;
             default:
                 alert('Unsupported file type! .m3u8, .nml, .csv and .m3u are supported.');
-                DOM.UI.Reset();
                 break;
         }
     }

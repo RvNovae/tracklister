@@ -32,6 +32,10 @@ html { height: 100%; overflow:auto; }
     border-bottom-right-radius: 0%;
 }
 
+#yesno_modal .modal-card{
+    width: 300px;
+}
+
 .footer {
     position: absolute;
     bottom: 0;

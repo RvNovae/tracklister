@@ -139,6 +139,7 @@
                 </div>
             </div>
         </div>
+
         <div class="modal" id="edit_modal">
             <div class="modal-background"></div>
             <div class="modal-card">
@@ -149,6 +150,22 @@
                 </div> 
             </div>
         </div>
+
+        <div class="modal" id="yesno_modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-body">
+                    <center><p class="title is-4">Start fresh?</p></center>
+                    <hr>
+                    <div class="buttons is-centered">
+                        <button class="button is-danger yesno_button" data-value="yes" onclick="DOM.Modal.Close('yesno_modal')">Yes</button>
+                        <button class="button is-primary yesno_button" data-value="no" onclick="DOM.Modal.Close('yesno_modal')">No</button>
+                        <button class="button yesno_button" data-value="cancel" onclick="DOM.Modal.Close('yesno_modal')">Cancel</button>
+                    </div>
+                </div> 
+            </div>
+        </div>
+
         <div class="modal" id="settings_modal">
             <div class="modal-background"></div>
             <div class="modal-card">

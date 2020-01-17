@@ -152,20 +152,49 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
     });
 });
 
+function YesNoPromise() {
+    return new Promise((resolve, reject) => {
+        Modal.Open('yesno_modal');
+        Array.from(document.getElementsByClassName('yesno_button')).forEach( (element) => {
+            element.addEventListener('click', (e) => {
+                resolve(e.srcElement.dataset.value);
+            });
+        });
+    });
+}
+
+function YesNo(files) {
+    YesNoPromise().then( (value) => {
+        if (value == 'yes') {
+            DOM.UI.Set();
+        }
+        if (value == 'cancel') {
+            return;
+        }
+        console.log(files);
+        for (const f of files) {
+            Converter.Start(f.path);
+        }
+    });
+}
+
 // listen for file drop
 document.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
     // clear / prepare the UI if playlist file
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(e.dataTransfer.files[0].path))) {
-        DOM.UI.Set();
-    }
-    
-    // get file object from drop
-    for (const f of e.dataTransfer.files) {
-        // start the conversion process
-        // convertFile(f.path);
-        Converter.Start(f.path);
+        if (Data.Tracks.length < 1) {
+            for (const f of e.dataTransfer.files) {
+                // start the conversion process
+                Converter.Start(f.path);
+            }
+            return;
+        }
+
+        YesNo(e.dataTransfer.files);
+
+        return;
     }
 });
 
