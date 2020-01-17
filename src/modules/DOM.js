@@ -163,21 +163,6 @@ function YesNo() {
     });
 }
 
-// function YesNo(files) {
-//     YesNoPromise().then( (value) => {
-//         if (value == 'yes') {
-//             DOM.UI.Set();
-//         }
-//         if (value == 'cancel') {
-//             return;
-//         }
-//         console.log(files);
-//         for (const f of files) {
-//             Converter.Start(f.path);
-//         }
-//     });
-// }
-
 function YesNo() {
     return new Promise((resolve, reject) => {
         Modal.Open('yesno_modal');
