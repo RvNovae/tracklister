@@ -95,13 +95,36 @@ Write = {
                         <a href="#" onclick="Editor.Edit.Start(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="Editor.Move.Up(this, `+counter+`)" class="dropdown-item">
-                            <i class="fas fa-angle-up"></i> Move Up 
-                        </a>
-                        <a href="#" onclick="Editor.Move.Down(this, `+counter+`)" class="dropdown-item">
-                            <i class="fas fa-angle-down"></i> Move Down
-                        </a>
+
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-up"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <input class="input" value=`+counter+` placeholder="Pos">
+                            </p> 
+                            <p class="control">
+                                <a class="button submit">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+
                         <hr class="dropdown-divider">
                         <a href="#" onclick="Editor.Add.Above(` + (counter) + `)" class="dropdown-item">
                             <i class="fas fa-angle-double-up"></i> Insert 1 above

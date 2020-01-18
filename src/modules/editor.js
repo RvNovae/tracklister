@@ -62,6 +62,7 @@ function addAbove(id) {
 
 function addBelow(id) {
     State.Adding.Below.Set(true);
+    
     addTrack(id);
 }
 
