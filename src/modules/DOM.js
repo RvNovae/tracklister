@@ -100,24 +100,24 @@ Write = {
 
                         <div class="field has-addons">
                             <p class="control">
-                                <a class="button">
-                                    <span class="icon is-small">
+                                <a class="button" onclick="Editor.Move.Down('move-`+ counter +`')">
+                                    <span class="icon is-small">          
                                         <i class="fas fa-angle-up"></i>
                                     </span>
                                 </a>
                             </p>
                             <p class="control">
-                                <a class="button">
+                                <a class="button" onclick="Editor.Move.Up('move-`+ counter +`')">
                                     <span class="icon is-small">
                                         <i class="fas fa-angle-down"></i>
                                     </span>
                                 </a>
                             </p>
                             <p class="control">
-                                <input class="input" value=`+counter+` placeholder="Pos">
+                                <input class="input" oninput="Editor.Move.Check(this)" data-pos="` + counter + `" id="move-`+ counter +`" value=`+counter+` placeholder="Pos">
                             </p> 
                             <p class="control">
-                                <a class="button submit">
+                                <a class="button submit" onclick="Editor.Move.To('move-`+ counter +`')">
                                     <span class="icon is-small">
                                         <i class="fas fa-check"></i>
                                     </span>
@@ -234,6 +234,7 @@ document.getElementById('erase_btn').addEventListener('click', function() {
     });
     
 });
+
 
 // NOT IMPLEMENTED YET
 

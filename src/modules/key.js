@@ -8,15 +8,28 @@ document.addEventListener('keyup', function(e) {
         });
     }
     if (e.key === "Enter") {
-        let counter = 0;
+        let modals = 0;
+        let contextMenus = 0;
+
         Array.from(document.getElementsByClassName('modal')).forEach(function(elem) {
             if (elem.classList.contains('is-active')) {
-                counter++;
+                modals++;
                 elem.getElementsByClassName('submit')[0].click();
+                return;
             }
         });
-        if (counter == 0) {
+
+        Array.from(document.getElementsByClassName('dropdown')).forEach( (element) => {
+            if (element.classList.contains('is-active')) {
+                contextMenus++;
+                element.getElementsByClassName('submit')[0].click();
+                return;
+            } 
+        });
+
+        if (modals == 0 && contextMenus == 0) {
             Editor.Add.Append('new');
+            return;
         }
     }
 });
