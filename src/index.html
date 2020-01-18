@@ -19,21 +19,22 @@
             <button class="button is-white is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">About</button>
             <center>
                 <p class="title is-3">Tracklister</p>
-                <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor, Serato and Virtual DJ!</p>
-                Drag and drop your .m3u8, .nml, .csv or .m3u file!
+                <!-- <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor, Serato and Virtual DJ!</p>
+                Drag and drop your .m3u8, .nml, .csv or .m3u file! -->
             </center>    
         </div>
         <hr>
         <div id="tracklist"></div>
         <div id="pure_text"></div>
-        <!-- <footer class="footer">
+        <footer class="footer" id="bpl_footer">
+            <div class="buttons"></div>
             <button class="button is-white is-small" id="add_bl_btn">
                 <span class="icon is-small">
                     <i class="fas fa-plus"></i>
                 </span>
             </button>
             <span id="bl_current"></span>
-        </footer> -->
+        </footer>
         <div class="modal" id="drop_modal">
                 <div class="modal-background"></div>
                 <center>
@@ -91,13 +92,26 @@
                                 <span class="tag is-info">.m3u</span>
                             </div>
                         </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">Single audio files</span>
+                                <span class="tag is-info">.wav</span>
+                                <span class="tag is-info">.mp3</span>
+                                <span class="tag is-info">.flac</span>
+                                <span class="tag is-info">.aiff</span>
+                                <span class="tag is-info">.aif</span>
+                                <span class="tag is-info">.aac</span>
+                                <span class="tag is-info">.ogg</span>
+                                <span class="tag is-info">.wma</span>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <p class="title">Settings Guide</p>
                     <p class="title is-5">Promo Syntax</p>
                     <p>
                         This is what the entry will be changed to when pressing the "Set To Promo" button. <br>
-                        Usually people use Unknown Artist - Unknown Title or ID - ID
+                        Usually people use <b>Unknown Artist - Unknown Title</b> or <b>ID - ID</b>
                     </p><br>
                     <p class="title is-5">Ignore List</p>
                     <p>
@@ -130,15 +144,21 @@
                         Especially if your - seperator is not spaced or does not exist. <br>
                         Tag your tracks, folks!
                     </p> 
+                    <p class="title is-5">Beatport-Link Integration</p>
+                    <p>
+                        Since creating tracklists with Beatport-Link tracks is an absolute pain, <br/>
+                        Tracklister will, when enabled, attempt to somewhat automate that process
+                    </p> 
                     <hr>
                     <p>
-                        Please be adviced that when disabling options that remove content,
+                        Please be adviced that when disabling options that alter content,
                         you will have to reload your source file, in order to restore that content.
                     </p> <br>
                     <button class="button is-link is-fullwidth" onclick="DOM.Modal.Close('help_modal')">Got it!</button>
                 </div>
             </div>
         </div>
+
         <div class="modal" id="edit_modal">
             <div class="modal-background"></div>
             <div class="modal-card">
@@ -149,6 +169,22 @@
                 </div> 
             </div>
         </div>
+
+        <div class="modal" id="yesno_modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-body">
+                    <center><p class="title is-4">Start fresh?</p></center>
+                    <hr>
+                    <div class="buttons is-centered">
+                        <button class="button is-danger submit yesno_button" data-value="yes" onclick="DOM.Modal.Close('yesno_modal')">Yes</button>
+                        <button class="button is-primary yesno_button" data-value="no" onclick="DOM.Modal.Close('yesno_modal')">No</button>
+                        <button class="button yesno_button" data-value="cancel" onclick="DOM.Modal.Close('yesno_modal')">Cancel</button>
+                    </div>
+                </div> 
+            </div>
+        </div>
+
         <div class="modal" id="settings_modal">
             <div class="modal-background"></div>
             <div class="modal-card">

@@ -14,11 +14,17 @@ module.exports = {
         }
     },
     Move: {
-        Up: function(element, id) {
-            moveUp(element, id)
+        Up: function(id) {
+            moveUp(id)
         },
-        Down: function(element, id) {
-            moveDown(element, id);
+        Down: function(id) {
+            moveDown(id);
+        },
+        Check: function(element) {
+            moveCheck(element);
+        },
+        To: function(id) {
+            moveTo(id);
         }
     },
     Delete: function(element, id) {
@@ -62,29 +68,65 @@ function addAbove(id) {
 
 function addBelow(id) {
     State.Adding.Below.Set(true);
+
     addTrack(id);
 }
 
 // if called, it shifts the track one position up in the array
 // => refresh the UI afterwards
-function moveUp(element, id) {
+function moveUp(id) {
     // make sure the element isn't the first
-    if (id-1 < 1) {}
-    else {
-        Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id-2);
-        DOM.UI.Update();
+    // if (id-1 < 1) {}
+    // else {
+    //     Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id-2);
+    //     DOM.UI.Update();
+    // }
+
+    let value = document.getElementById(id).value;
+    if (value < Data.Tracks.length) {
+        value++;
     }
+    
+    document.getElementById(id).value = value;
 }
 // if called, it shifts the track one position down in the array
 // => refresh the UI afterwards
-function moveDown(element, id) {
+function moveDown(id) {
     // make sure the element isn't the last
-    if (id-1 > Data.Tracks.length-1) {}
-    else {
-        Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id);
-        DOM.UI.Update();
+    // if (id-1 > Data.Tracks.length-1) {}
+    // else {
+    //     Data.Tracks = ARRAY_MOVE(Data.Tracks, id-1, id);
+    //     DOM.UI.Update();
+    // }
+
+    let value = document.getElementById(id).value;
+    if (value > 1) {
+        value--;
     }
+    document.getElementById(id).value = value;
 }
+
+function moveCheck(element) {
+
+    if (element.value > Data.Tracks.length && element.value != '') {
+        element.value = Data.Tracks.length;
+    }
+    if (element.value < 1 && element.value != '') {
+        element.value = 1;
+    }
+
+}
+
+function moveTo(id) {
+    let currentPos = document.getElementById(id).getAttribute('data-pos');
+    let desiredPos = document.getElementById(id).value;
+
+    console.log(currentPos + " " + desiredPos);
+
+    Data.Tracks = ARRAY_MOVE(Data.Tracks, currentPos-1, desiredPos-1);
+    DOM.UI.Update();
+}
+
 
 // populates the edit modal form with values and opens it
 // sets is_editing to the id of the counter of the track that is being edited,

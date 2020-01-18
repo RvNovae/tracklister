@@ -12,10 +12,11 @@ require('./modules/key'); // key functions never have to be called explicitly, t
 
 // some of tracklister's functions need to be invoked at program start.
 Settings.Start();
-if (REMOTE.process.platform == 'win-32') { // Currently beatport-link functionality only works on Windows
+
+if (REMOTE.process.platform == 'win32') { // Currently beatport-link functionality only works on Windows
     try {
-        const BeatportLink = require('./modules/beatport-link');
-        BeatportLink.Start();
+        // const BeatportLink = require('./modules/beatport-link');
+        // BeatportLink.Start();
     }
     catch (err) {
         console.log("BeatportLink integration could not be initialised: " + err);

@@ -54,6 +54,7 @@ function monitor(path) {
 
                         console.log(artist + " - " + title);
                         document.getElementById('bl_current').innerHTML = artist + " - " + title;
+                        document.getElementById('bpl_footer').style.visibility = "visible";
                     }
                     
                 },

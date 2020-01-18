@@ -5,6 +5,7 @@ const Converter = require('./converter');
 const Filter = require('./filter');
 
 window.scrollPos = 0;
+document.getElementById('bpl_footer').style.visibility = "hidden";
 
 Modal = {
     Close: function(id){
@@ -88,19 +89,42 @@ Write = {
                             <i class="fas fa-eraser"></i> Delete
                         </a>
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item has-text-warning">
+                        <a href="#" style="color:#0277BD" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-asterisk"></i> Set to Promo
                         </a>
                         <a href="#" onclick="Editor.Edit.Start(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="Editor.Move.Up(this, `+counter+`)" class="dropdown-item">
-                            <i class="fas fa-angle-up"></i> Move Up 
-                        </a>
-                        <a href="#" onclick="Editor.Move.Down(this, `+counter+`)" class="dropdown-item">
-                            <i class="fas fa-angle-down"></i> Move Down
-                        </a>
+
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button" onclick="Editor.Move.Down('move-`+ counter +`')">
+                                    <span class="icon is-small">          
+                                        <i class="fas fa-angle-up"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" onclick="Editor.Move.Up('move-`+ counter +`')">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <input class="input" oninput="Editor.Move.Check(this)" data-pos="` + counter + `" id="move-`+ counter +`" value=`+counter+` placeholder="Pos">
+                            </p> 
+                            <p class="control">
+                                <a class="button submit" onclick="Editor.Move.To('move-`+ counter +`')">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+
                         <hr class="dropdown-divider">
                         <a href="#" onclick="Editor.Add.Above(` + (counter) + `)" class="dropdown-item">
                             <i class="fas fa-angle-double-up"></i> Insert 1 above
@@ -152,20 +176,44 @@ Array.from(document.getElementsByClassName('modal-background')).forEach(function
     });
 });
 
+function YesNo() {
+    return new Promise((resolve, reject) => {
+        Modal.Open('yesno_modal');
+        Array.from(document.getElementsByClassName('yesno_button')).forEach( (element) => {
+            element.addEventListener('click', (e) => {
+                resolve(e.srcElement.dataset.value);
+            });
+        });
+    });
+}
+
 // listen for file drop
 document.addEventListener('drop', (e) => {
+    files = e.dataTransfer.files;
     e.preventDefault();
     e.stopPropagation();
     // clear / prepare the UI if playlist file
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(e.dataTransfer.files[0].path))) {
-        DOM.UI.Set();
-    }
-    
-    // get file object from drop
-    for (const f of e.dataTransfer.files) {
-        // start the conversion process
-        // convertFile(f.path);
-        Converter.Start(f.path);
+        if (Data.Tracks.length < 1) {
+            for (const f of e.dataTransfer.files) {
+                // start the conversion process
+                Converter.Start(f.path);
+            }
+            return;
+        }
+
+        YesNo().then( (val) => {
+            if (val == 'yes') 
+                DOM.UI.Set();
+            if (val == 'cancel') 
+                return;
+
+            for (const f of files) {
+                Converter.Start(f.path);
+            }
+        });
+
+        return;
     }
 });
 
@@ -177,9 +225,16 @@ document.getElementById('copy_btn').addEventListener('click', function() {
     this.innerHTML = '<i class="fas fa-copy"></i>';
 });
 document.getElementById('erase_btn').addEventListener('click', function() {
-    Data.Tracks.length = 0;
-    DOM.UI.Reset();
+    if (Data.Tracks.length < 1) {return;}
+    YesNo().then((val) => {
+        if (val == 'yes') {
+            Data.Tracks.length = 0;
+            DOM.UI.Reset();
+        }
+    });
+    
 });
+
 
 // NOT IMPLEMENTED YET
 
