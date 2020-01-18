@@ -215,6 +215,13 @@ document.addEventListener('drop', (e) => {
 
         return;
     }
+    else {
+        for (const f of e.dataTransfer.files) {
+            // start the conversion process
+            Converter.Start(f.path);
+        }
+        return;
+    }
 });
 
 // add event listener for the copy button
