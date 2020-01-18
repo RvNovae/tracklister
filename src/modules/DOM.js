@@ -89,7 +89,7 @@ Write = {
                             <i class="fas fa-eraser"></i> Delete
                         </a>
                         <hr class="dropdown-divider">
-                        <a href="#" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item has-text-warning">
+                        <a href="#" style="color:#0277BD" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-asterisk"></i> Set to Promo
                         </a>
                         <a href="#" onclick="Editor.Edit.Start(this, `+counter+`)" class="dropdown-item">
