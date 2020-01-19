@@ -31,7 +31,8 @@ module.exports = {
             case 'aif':
             case 'aac':
             case 'ogg':
-            case 'wma':  
+            case 'wma':
+            case 'alac':    
                 audio(inputFile);
                 break;
             default:
