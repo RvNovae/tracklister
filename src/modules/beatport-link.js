@@ -3,14 +3,23 @@ const FIRSTLINE = require('firstline');
 const FS = require('fs');
 const PROCESS = require('process');
 
+const Settings = require('./settings');
+
 var lastID = 0;
 var rekordboxPath = getRekordboxPath();
 var isMonitoring = false;
+var track = {
+    artist: "",
+    title: ""
+}
 
 module.exports = {
-    IsMonitoring: isMonitoring,
+    IsMonitoring: () => {
+        return Settings.Get().bpl.switch;
+    },
     Start: function() {
         isMonitoring = true;
+        console.log("Start monitoring!");
         setInterval(function() {
             if (isMonitoring) {
                 
@@ -19,7 +28,11 @@ module.exports = {
         }, 1000);
     },
     Stop: function() {
+        console.log("Stop monitoring.");
         isMonitoring = false;
+    },
+    Add: () => {
+        Data.Add(track.artist, track.title);
     }
 }
 
@@ -36,9 +49,15 @@ function monitor(path) {
             result.then(
                 function(resolve) {
 
-                    if (typeof extractJSON(resolve) == 'undefined') {
-                        return;
+                    try {
+                        if (typeof extractJSON(resolve) == 'undefined') {
+                            return;
+                        } 
                     }
+                    catch (err) {
+                        console.log(err);
+                    }
+                    
 
                     var object = JSON.parse(extractJSON(resolve));
 
@@ -47,12 +66,13 @@ function monitor(path) {
                     }
                     else {
                         lastID = object.id;
-                        console.log(object);
                         
                         artist = formatArtist(object);
                         title = formatTitle(object);
 
-                        console.log(artist + " - " + title);
+                        track.artist = artist;
+                        track.title = title;
+
                         document.getElementById('bl_current').innerHTML = artist + " - " + title;
                         document.getElementById('bpl_footer').style.visibility = "visible";
                     }
@@ -126,7 +146,7 @@ function extractJSON(input) {
 }
 
 function getRekordboxPath() {
-    let temp;
+    let temp = "";
 
     temp = PROCESS.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
     temp += FS.readdirSync(temp)[0];

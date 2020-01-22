@@ -3,6 +3,7 @@ const { clipboard } = require('electron');
 const Data = require('./data');
 const Converter = require('./converter');
 const Filter = require('./filter');
+const BeatportLink = require('./beatport-link');
 
 window.scrollPos = 0;
 document.getElementById('bpl_footer').style.visibility = "hidden";
@@ -46,6 +47,7 @@ UI = {
         document.getElementById("pure_text").innerHTML = "";
 
         // style copy button to convey that the latest changes have not been copied yet
+        document.getElementById("copy_btn").disabled = false;
         document.getElementById('copy_btn').innerHTML = '<i class="far fa-copy"></i>';
         // iterate through tracks array and call writeTrack() to write them to screen and to pure_text
         Data.Tracks.forEach(function (track) {
@@ -85,16 +87,19 @@ Write = {
                 </div>
                 <div class="dropdown-menu" id="dropdown-`+counter+`" role="menu">
                     <div class="dropdown-content">
-                        <a href="#" onclick="Editor.Delete(this, `+counter+`)" class="dropdown-item has-text-danger">
-                            <i class="fas fa-eraser"></i> Delete
-                        </a>
-                        <hr class="dropdown-divider">
-                        <a href="#" style="color:#0277BD" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item">
-                            <i class="fas fa-asterisk"></i> Set to Promo
-                        </a>
                         <a href="#" onclick="Editor.Edit.Start(this, `+counter+`)" class="dropdown-item">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+
+                        <a href="#" style="color:#0277BD" onclick="Editor.Edit.Promo(this, `+counter+`)" class="dropdown-item">
+                            <i class="fas fa-asterisk"></i> Set to Promo
+                        </a>
+
+                        <hr class="dropdown-divider">
+
+                        <a href="#" onclick="Editor.Delete(this, `+counter+`)" class="dropdown-item has-text-danger">
+                            <i class="fas fa-eraser"></i> Delete
+                        </a>     
 
                         <hr class="dropdown-divider">
 
@@ -195,6 +200,7 @@ document.addEventListener('drop', (e) => {
     // clear / prepare the UI if playlist file
     if (RegExp('.m3u8|.csv|.m3u|.nml').test(Helper.RegExp.Escape(e.dataTransfer.files[0].path))) {
         if (Data.Tracks.length < 1) {
+            DOM.UI.Set();
             for (const f of e.dataTransfer.files) {
                 // start the conversion process
                 Converter.Start(f.path);
@@ -239,6 +245,21 @@ document.getElementById('erase_btn').addEventListener('click', function() {
             DOM.UI.Reset();
         }
     });
+    
+});
+
+document.getElementById('add_bl_btn').addEventListener('click', (e) => {
+    BeatportLink.Add();
+    document.getElementById('bpl_footer').style.visibility = "hidden";
+});
+
+document.getElementById('settings_bpl_switch').addEventListener('change', (e) => {
+    if (e.srcElement.checked) {
+        BeatportLink.Start();
+    }
+    else {
+        BeatportLink.Stop();
+    }
     
 });
 

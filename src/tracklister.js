@@ -15,8 +15,8 @@ Settings.Start();
 
 if (REMOTE.process.platform == 'win32') { // Currently beatport-link functionality only works on Windows
     try {
-        // const BeatportLink = require('./modules/beatport-link');
-        // BeatportLink.Start();
+        const BeatportLink = require('./modules/beatport-link');
+        BeatportLink.Start();
     }
     catch (err) {
         console.log("BeatportLink integration could not be initialised: " + err);

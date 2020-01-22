@@ -1,7 +1,11 @@
 var tracks = [];
 
 module.exports = {
-    Tracks: tracks
+    Tracks: tracks,
+    Add: (artist, title) => {
+        tracks.push(artist + " - " + title);
+        DOM.UI.Update();
+    }
 }
 
 class Track {
