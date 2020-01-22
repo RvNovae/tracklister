@@ -6,7 +6,7 @@ Audio files can now be manually added as well.
 
 Additional tools and special filters ensure a consistent and good looking tracklist.
 
-![Preview Image](https://puu.sh/DSdvk/ce9b8aaa6e.png)
+![Preview Image](https://i.imgur.com/lPakphe.png)
 
 ## Installers
 Windows
