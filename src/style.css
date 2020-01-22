@@ -41,7 +41,7 @@ html { height: 100%; overflow:auto; }
     position: fixed;
     bottom: 0;
     background-color: rgb(38, 38, 38);
-    font-weight: bold;
+    /* font-weight: bold; */
     color: white;
     padding: 2px;
     width: 100%;
