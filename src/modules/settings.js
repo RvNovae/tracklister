@@ -50,6 +50,8 @@ function load() {
                 document.getElementById('settings_and_selector').value = settings.syntax.and;
                 document.getElementById('settings_featured_fixer_switch').checked = settings.featured_fix.switch;
                 document.getElementById('settings_bpl_switch').checked = settings.bpl.switch;
+                document.getElementById('settings_bpl_auto').checked = settings.bpl.auto;
+
             }
             catch(err) {
                 reset();
@@ -77,6 +79,7 @@ function reset() {
     settings.bpl = {};
     settings.bpl.switch = false;
     settings.bpl.path = "";
+    settings.bpl.auto = false;
 
     console.log("Reset");
    
@@ -101,6 +104,7 @@ function save() {
     settings.omit.switch = document.getElementById('settings_omit_switch').checked;
     settings.omit.keywords = document.getElementById('settings_omit_input').value;
     settings.bpl.switch = document.getElementById('settings_bpl_switch').checked;
+    settings.bpl.auto = document.getElementById('settings_bpl_auto').checked;
 
     // save settings to disk
     STORAGE.set('settings', settings, function(err) {

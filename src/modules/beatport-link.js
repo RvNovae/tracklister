@@ -25,7 +25,7 @@ module.exports = {
                 
                 monitor(rekordboxPath);
             }
-        }, 1000);
+        }, 500);
     },
     Stop: function() {
         console.log("Stop monitoring.");
@@ -73,8 +73,13 @@ function monitor(path) {
                         track.artist = artist;
                         track.title = title;
 
-                        document.getElementById('bl_current').innerHTML = artist + " - " + title;
-                        document.getElementById('bpl_footer').style.visibility = "visible";
+                        if (Settings.Get().bpl.auto) {
+                            Data.Add(track.artist, track.title);
+                        }
+                        else {
+                            document.getElementById('bl_current').innerHTML = artist + " - " + title;
+                            document.getElementById('bpl_footer').style.visibility = "visible";
+                        }
                     }
                     
                 },
