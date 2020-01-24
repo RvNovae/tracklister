@@ -152,10 +152,16 @@ function extractJSON(input) {
 
 function getRekordboxPath() {
     let temp = "";
-
-    temp = PROCESS.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
-    temp += FS.readdirSync(temp)[0];
-    temp += PATH.sep + "tr";
+    try {
+        temp = PROCESS.env.APPDATA + PATH.sep + "Pioneer" + PATH.sep + "rekordbox" + PATH.sep + "beatport" + PATH.sep
+        temp += FS.readdirSync(temp)[0];
+        temp += PATH.sep + "tr";
+    }
+    catch (err) {
+        console.log("Could not get Rekordbox path: " + err);
+        console.log("Stop monitoring.");
+        isMonitoring = false;
+    }
     
     return temp;
 }
