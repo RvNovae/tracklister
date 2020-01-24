@@ -177,7 +177,9 @@ module.exports = {
 Array.from(document.getElementsByClassName('modal-background')).forEach(function(element) {
     element.addEventListener('click', function() {
         //element.parentNode.classList.remove('is-active');
-        Modal.Close(element.parentNode.id);
+        if (element.parentNode.id != 'yesno_modal') {
+            Modal.Close(element.parentNode.id);
+        }
     });
 });
 
