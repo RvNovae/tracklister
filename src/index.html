@@ -14,16 +14,17 @@
             <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
             <button class="button is-white is-small" id="erase_btn"><i class="fas fa-eraser"></i></button>
             <button class="button is-white is-small" onclick="Editor.Add.Append('new')" id="add_btn"><i class="fas fa-plus"></i></button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('help_modal')" id="help_btn">Help</button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('settings_modal')" id="settings_btn">Settings</button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">About</button>
-            <center>
-                <p class="title is-3">Tracklister</p>
+            <button class="button is-white is-small" onclick="DOM.Modal.Open('settings_modal')" id="settings_btn"><i class="fas fa-cogs"></i></button>
+            <button class="button is-white is-small" onclick="DOM.Modal.Open('help_modal')" id="help_btn"><i class="fas fa-question"></i></button>
+            <button class="button is-dark is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">Tracklister</button>
+
+            <!-- <center>
+                <p class="title is-3">Tracklister</p> -->
                 <!-- <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor, Serato and Virtual DJ!</p>
                 Drag and drop your .m3u8, .nml, .csv or .m3u file! -->
-            </center>    
+            <!-- </center>     -->
         </div>
-        <hr>
+        <!-- <hr> -->
         <div id="tracklist"></div>
         <div id="pure_text"></div>
         <footer class="footer" id="bpl_footer">
