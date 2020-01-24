@@ -2,7 +2,7 @@
 const {app, BrowserWindow } = require('electron')
 const path = require('path')
 
-const MODE = "DEBUG";
+const DEBUG = true;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -25,7 +25,7 @@ function createWindow () {
   mainWindow.loadFile('src/index.html')
 
   // Open the DevTools.
-  if (MODE == "DEBUG") {
+  if (DEBUG == true) {
     mainWindow.webContents.openDevTools();
   }
 
