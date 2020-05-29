@@ -20,7 +20,7 @@
     "bulma": "^0.8.0",
     "electron-json-storage": "^4.1.8",
     "firstline": "^2.0.2",
-    "music-metadata": "^4.8.2",
+    "music-metadata": "^6.4.0",
     "roboto-fontface": "^0.10.0",
     "xml-js": "^1.6.11"
   },
