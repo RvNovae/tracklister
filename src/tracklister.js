@@ -11,7 +11,6 @@ const Editor = require('./modules/editor'); // NOT UNUSED, the HTML needs the co
 require('./modules/key'); // key functions never have to be called explicitly, therefore it doesn't need a constant 
 
 // some of tracklister's functions need to be invoked at program start.
-Settings.Start();
 
 if (REMOTE.process.platform == 'win32') { // Currently beatport-link functionality only works on Windows
     try {
