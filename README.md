@@ -1,6 +1,6 @@
 # Tracklister
 
-This utility converts .m3u8, .nml, .csv & .m3u files (exported from Rekordbox, Traktor, 
+This utility converts `.m3u8`, `.nml`, `.csv` & `.m3u` files (exported from Rekordbox, Traktor, 
 Serato and Virtual DJ respectively) into readable tracklists.
 Audio files can now be manually added as well.
 
