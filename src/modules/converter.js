@@ -31,7 +31,9 @@ module.exports = {
             case 'aif':
             case 'aac':
             case 'ogg':
-            case 'wma':  
+            case 'wma':
+            case 'alac':  
+            case 'm4a':  
                 audio(inputFile);
                 break;
             default:
@@ -144,25 +146,28 @@ function nml(input_file) {
         json = XML_JS.xml2json(contents, {compact: true, spaces: 4});
         // parse the json into a javascript object
         content = JSON.parse(json);
-        // iterate through all 'Entry' elements 
-        content.NML.COLLECTION.ENTRY.forEach(element => {
-            // increase counter
-            counter += 1;
-            // extract data from the artist and title column
-            // save to the track variable
-            try {
-                track = element._attributes.ARTIST + " - " + element._attributes.TITLE
-            }
-            // if the track is not tagged properly, this may cause issues
-            // set track to an error message
-            catch {
-                track = "###Error, is this file tagged properly?";
-            }
-            // write track
-            var ignored = DOM.Write.Track(track, counter);
-            // if it does not pass, the counter has to be decreased to account for the missing track
-            if (ignored == 0) {counter--}
-        });
+                
+        entry = content.NML.PLAYLISTS.NODE.SUBNODES.NODE.PLAYLIST.ENTRY;
+        entryCount = content.NML.PLAYLISTS.NODE.SUBNODES.NODE.PLAYLIST._attributes.ENTRIES
+    
+        for (let i = 0; i < entryCount; i++) { 
+            content.NML.COLLECTION.ENTRY.forEach(element => {
+                compareKey = element.LOCATION._attributes.VOLUME + element.LOCATION._attributes.DIR + element.LOCATION._attributes.FILE;
+                if (compareKey == entry[i].PRIMARYKEY._attributes.KEY) {
+                    counter += 1;
+                    try {
+                        track = element._attributes.ARTIST + " - " + element._attributes.TITLE
+                    }
+                    catch {
+                        track = "###Error, is this file tagged properly?";
+                    }
+
+                    var ignored = DOM.Write.Track(track, counter);
+                    if (ignored == 0) {counter--}
+                    return;
+                }
+            });
+        }
     }); 
 }
 

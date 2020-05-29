@@ -14,26 +14,27 @@
             <button class="button is-white is-small" id="copy_btn" disabled><i class="far fa-copy"></i></button>
             <button class="button is-white is-small" id="erase_btn"><i class="fas fa-eraser"></i></button>
             <button class="button is-white is-small" onclick="Editor.Add.Append('new')" id="add_btn"><i class="fas fa-plus"></i></button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('help_modal')" id="help_btn">Help</button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('settings_modal')" id="settings_btn">Settings</button>
-            <button class="button is-white is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">About</button>
-            <center>
-                <p class="title is-3">Tracklister</p>
+            <button class="button is-white is-small" onclick="DOM.Modal.Open('settings_modal')" id="settings_btn"><i class="fas fa-cogs"></i></button>
+            <button class="button is-white is-small" onclick="DOM.Modal.Open('help_modal')" id="help_btn"><i class="fas fa-question"></i></button>
+            <button class="button is-dark is-small" onclick="DOM.Modal.Open('about_modal')" id="about_btn">Tracklister</button>
+
+            <!-- <center>
+                <p class="title is-3">Tracklister</p> -->
                 <!-- <p class="subtitle is-5 is-underlined">For Rekordbox, Traktor, Serato and Virtual DJ!</p>
                 Drag and drop your .m3u8, .nml, .csv or .m3u file! -->
-            </center>    
+            <!-- </center>     -->
         </div>
-        <hr>
+        <!-- <hr> -->
         <div id="tracklist"></div>
         <div id="pure_text"></div>
         <footer class="footer" id="bpl_footer">
-            <div class="buttons"></div>
-            <button class="button is-white is-small" id="add_bl_btn">
-                <span class="icon is-small">
+            <span id="bpl_footer_content">
+                <a href="#" id="add_bl_btn"><span class="icon is-small">
                     <i class="fas fa-plus"></i>
-                </span>
-            </button>
-            <span id="bl_current"></span>
+                </span></a>
+                <span id="bl_current">RvNovae - Neutron Star</span>
+            </span>
+            
         </footer>
         <div class="modal" id="drop_modal">
                 <div class="modal-background"></div>
@@ -143,11 +144,13 @@
                         Be careful, if your tracks are not tagged properly, this may cause issues. <br>
                         Especially if your - seperator is not spaced or does not exist. <br>
                         Tag your tracks, folks!
-                    </p> 
+                    </p> <br>
                     <p class="title is-5">Beatport-Link Integration</p>
                     <p>
                         Since creating tracklists with Beatport-Link tracks is an absolute pain, <br/>
-                        Tracklister will, when enabled, attempt to somewhat automate that process
+                        Tracklister will, when enabled, attempt to somewhat automate that process. <br/>
+                        Whenever you load a BeatportLink track into a deck, a little panel with artist and title should pop up at the bottom of the screen.
+                        When the plus button is clicked, that track will be appended to your current tracklist.
                     </p> 
                     <hr>
                     <p>
@@ -213,7 +216,12 @@
                     <hr>
                     <label><input id="settings_featured_fixer_switch" type="checkbox"> Fix featured artists</label>
                     <hr>
+                    <label><input id="settings_bpl_switch" type="checkbox"> BeatportLink Integration</label>
+                    <br>
+                    <label><input id="settings_bpl_auto" type="checkbox"> Automatically add BeatportLink tracks</label>
+                    <hr>
                     <a class="button submit is-link is-fullwidth" onclick="Settings.Save()" id="save_submit">Save</a>
+                    
                 </div> 
             </div>
         </div>
