@@ -17,5 +17,5 @@ steps:
 
 - script: |
     npm install
-    electron-builder .
+    npm run dist
   displayName: 'npm install and build'
